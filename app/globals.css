@@ -1,26 +1,194 @@
-@import "tailwindcss";
+ 
+@import url(../css/login.css);
+@import url(../css/header.css);
+@import url(../css/SideNav.css);
+@import url(../css/table.css);
+ 
+
+@tailwind utilities;
+
+*,
+::before,
+::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --accent-white: #fff;
+  --background: #F9FAFB;
+  --photo-background: #f4f4f4;
+  --accent-black: #000;
+  --accent-black-two: #05162e;
+  --accent-blue: #0866FF;
+  --accent-green: #0ABF7E;
+  --accent-background-blue: #eaf6ff;
+  --second-text-color: #737373;
+  --text-color: #292929;
+  --underline-text: #393646;
+  --text-input: #393e46;
+  --accent-profile: #f8c993;
+  --border-color: #e5e4e9;
+  --border: #34495d;
+   --gray-light: #8F8F8F;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+ul ol {
+  list-style: outside !important;
+  display: block !important;
+  list-style-type: disc !important;
+}
+
+input {
+  font-size: 16px;
+}
+
+/* input,  */
+button,
+textarea,
+select,
+table {
+  font: inherit;
+  box-sizing: border-box;
+  font-size: 12px;
+}
+@media (max-width: 1200px) {
+  /* input,  */
+  button,
+  textarea,
+  select,
+  table {
+    font: small;
   }
 }
+a {
+  text-decoration: none !important;
+  color: inherit;
+  cursor: pointer;
+}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+button:active {
+  border: none;
+  transform: scale(0.98) !important; 
+}
+
+button {
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease !important;
+    background: none !important;
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--accent-white); 
+  overflow-x: auto; 
+  border: 1px solid #ddd;
+		border-radius: 8px !important;
+}
+
+ 
+
+
+thead {
+  background: #F9FAFB;
+  text-align: left;
+		
+}
+
+th, td {
+  /* padding: 12px 16px; */
+  border-bottom: 1px solid #ddd; 
+min-width: 40px;
+height: 19px; 
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 19px; 
+color: #667085; 
+}
+
+th {
+  font-weight: 600;
+  color: #333;
+}
+
+tbody tr:nth-child(even) {
+  background: #fff;
+}
+
+tbody tr:hover {
+  background: #f9f9f9;
+}
+
+td {  
+width: 149px;
+height: 20px; 
+font-style: normal;
+font-weight: 500;
+font-size: 15px;
+line-height: 20px; 
+color: #101828; 
+}
+
+ 
+
+td:last-child:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar container */
+::-webkit-scrollbar {
+  width: 2px !important; /* Width of the scrollbar */
+  height: 8px; /* Height for horizontal scrollbars */
+}
+
+/* Scrollbar track (background) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light grey background */
+  border-radius: 6px; /* Rounded corners */
+}
+
+/* Scrollbar handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #8888886f; /* Darker grey handle */
+  border-radius: 6px; /* Rounded corners */
+}
+
+/* Hover effect on the handle */
+::-webkit-scrollbar-thumb:hover {
+  background: #5555559f; /* Even darker grey */
+}
+
+main {
+  grid-area: main;
+  overflow-y: auto; 
+  width: 100%;
+  padding: 32px;
+}
+
+
+#page-wrapper {
+  display: grid;
+  position: relative;
+  height: 100dvh;
+  grid-template-columns: max-content 1fr;
+  grid-template-rows: 60px 1fr;
+  grid-template-areas:
+    'sidenav header'
+    'sidenav main'
+    'sidenav footer';
 }
