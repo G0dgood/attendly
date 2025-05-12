@@ -13,13 +13,13 @@
 
 /* Media query for small screens */
 @media screen and (max-width: 1080px) {
-   /* #header {
+   #header {
   grid-area: header;
   background: var(--background);
   display: flex;
   justify-content: space-between;
   align-items: center; 
    padding:  0px 1rem !important; 
-} */
+}
 }
   

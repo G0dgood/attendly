@@ -4,10 +4,10 @@
   grid-area: sidenav  ;
   background: var(--white); 
   border-right: 1px solid rgba(28, 28, 28, 0.1); 
-  display: block;
-  padding: 5px 20px;
+  display: block; 
   height: 100%;  
   overflow: hidden; 
+  background-color: var(--accent-white);
 }
  
 

@@ -1,32 +1,52 @@
 'use client';
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SVGLoader } from "../components/SVGLoader";
 import { IoEyeSharp, IoEyeOffSharp } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useUserPrivileges } from "@/utils/userPrivileges";
+
+
 
 export default function Home() {
   const router = useRouter()
-
-
-
-
+  const { isSuperAdmin } = useUserPrivileges();
   const [visible, setVisible] = useState(false);
-
   const [email, setEmail] = useState("");
-  const [pwd, setPwd] = useState("");
+  const [password, setpassword] = useState("");
   const [loading, setLoading] = useState(false);
 
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false, // VERY IMPORTANT
+      callbackUrl: "/dashboard",
+    });
+
+    setLoading(false);
+
+    if (res?.ok) {
+
+    } else {
+      alert("Invalid email or password");
+    }
   };
 
 
-  const handleLogin = () => {
-    router.push('/employee')
-  }
+  console.log('isSuperAdmin-isSuperAdmin', isSuperAdmin, isSuperAdmin)
 
+
+  useEffect(() => {
+    if (isSuperAdmin) {
+      router.push('/dashboard')
+    }
+  }, [isSuperAdmin]);
 
 
   return (
@@ -47,7 +67,7 @@ export default function Home() {
           </div>
         </div> 
       </div> */}
-      <div className="w-[420px] shadow-xl rounded-[8px] p-[24px] bg-[#fff] ">
+      <div className="w-[420px] shadow-xl   p-[24px] bg-[#fff] ">
         <div className="">
           <Image
             src={require("../public/img/logo.png")}
@@ -68,7 +88,7 @@ export default function Home() {
               <label htmlFor="" className="font-lato font-normal text-[14px]  text-[#3A4050]">Email Address</label>
               <input
                 type="email"
-                className="p-[10px] rounded-[8px] border w-full outline-none"
+                className="p-[10px]   border w-full outline-none"
                 placeholder="example@gmail.com"
                 required
                 value={email}
@@ -80,11 +100,11 @@ export default function Home() {
               <div className="relative">
                 <input
                   type={visible ? "text" : "password"}
-                  className="p-[10px] rounded-[8px] border w-full outline-none"
+                  className="p-[10px]   border w-full outline-none"
                   placeholder="**********"
                   required
-                  value={pwd}
-                  onChange={(e) => setPwd(e.target.value)}
+                  value={password}
+                  onChange={(e) => setpassword(e.target.value)}
                 />
                 <div
                   className="absolute right-2 top-4 cursor-pointer"
@@ -102,12 +122,11 @@ export default function Home() {
               </div>
             </div>
             <button
-              onClick={handleLogin}
-              className=" text-[#fff] bold rounded-[8px] w-full p-[10px] h-[40px] bg-[#002DB3] text-white text-[16px] font-semibold flex justify-center items-center"
-              disabled={loading}
-            >
-              {/* {loading ? <SVGLoader width={"25px"} height={"25px"} color={"#FFF"} /> : "Login"} */}
-              Login
+              // onClick={() => router.push('/dashboard')}
+              type="submit"
+              className=" text-[#fff] bold  w-full p-[10px] h-[40px] !bg-[#002DB3] text-[16px] font-semibold flex justify-center items-center"
+              disabled={loading}>
+              {loading ? <SVGLoader width={"20px"} height={"20px"} color={"#FFF"} /> : "Login"}
             </button>
           </form>
         </div>
@@ -116,5 +135,9 @@ export default function Home() {
     </div>
   );
 }
+
+
+
+
 
 

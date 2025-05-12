@@ -18,9 +18,9 @@ const EmployeeDashBoard = () => {
 		<div>
 			<PageHeader text={"Employee"} />
 
-			<div className='flex flex-row justify-between gap-[20px] mt-[24px]'>
+			<div className='flex flex-col md:flex-row justify-between gap-[20px] mt-[24px]'>
 				<Search />
-				<button className="flex flex-row justify-center items-center px-2 py-[8px] gap-2 w-[150px] h-[40px] !bg-[#002DB3]  font-normal text-[14px] leading-[150%] text-[#FFFFFF]">
+				<button className=" w-full cursor-pointer flex flex-col md:flex-row justify-center items-center px-2 py-[8px] gap-2 md:w-[150px] h-[40px] !bg-[#002DB3]  font-normal text-[14px] leading-[150%] text-[#FFFFFF]">
 					Add New Employee
 				</button>
 			</div>
@@ -69,7 +69,7 @@ const EmployeeDashBoard = () => {
 											<td data-title='Designation'>{user?.designation || 'N/A'}</td>
 											<td data-title='Email'>{user?.email}</td>
 											<td data-title='Action'>
-												<div className='flex flex-row gap-[10px]'>
+												<div className='flex flex-row gap-[20px]'>
 													<button className='cursor-pointer'>
 														<Image
 															src={require("../../public/Trash_light.svg")}

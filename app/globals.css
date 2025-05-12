@@ -3,9 +3,12 @@
 @import url(../css/header.css);
 @import url(../css/SideNav.css);
 @import url(../css/table.css);
+@import url(../css/footer.css);
  
 
+ 
 @tailwind utilities;
+@import "tailwindcss";
 
 *,
 ::before,
@@ -37,7 +40,8 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: hidden; 
+  background-color: #F9FAFB 
 }
 img,
 svg {
@@ -145,6 +149,15 @@ color: #101828;
 }
 
  
+@keyframes fadeIn {
+	from { opacity: 0; transform: translateY(10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+	animation: fadeIn 0.3s ease-out;
+}
+
 
 td:last-child:hover {
   text-decoration: underline;
@@ -178,6 +191,23 @@ main {
   overflow-y: auto; 
   width: 100%;
   padding: 32px;
+  /* background-color: #F9FAFB !important; */
+}
+
+/* Medium screens and up (≥768px) */
+@media (min-width: 768px) {
+  main {
+    padding: 30px;
+  }
+}
+
+ 
+
+/* Extra small screens (≤640px) */
+@media (max-width: 640px) {
+  main {
+    padding: 20px;
+  }
 }
 
 
@@ -186,7 +216,7 @@ main {
   position: relative;
   height: 100dvh;
   grid-template-columns: max-content 1fr;
-  grid-template-rows: 60px 1fr;
+  grid-template-rows: 70px 1fr;
   grid-template-areas:
     'sidenav header'
     'sidenav main'

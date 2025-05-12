@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Search = () => {
 	return (
-		<div className=' w-[320px] h-[40px] flex flex-row items-center px-[14px] py-[10px] gap-[8px] bg-white border border-[#E5E7EB]  '>
+		<div className=' !bg-[#fff] w-full md:w-[320px] h-[40px] flex flex-row items-center px-[14px] py-[10px] gap-[8px] border border-[#E5E7EB]  '>
 			<button>
 				<Image
 					src={require("../public/DashboardIcon/search-refraction.svg")}
