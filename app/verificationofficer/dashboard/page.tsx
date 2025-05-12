@@ -33,7 +33,7 @@ const EmployeeDashBoard = () => {
 
 									<div className='flex flex-row items-center gap-[8px]'>
 										<Image
-											src={require("../../public/DashboardIcon/trend-up.svg")}
+											src={require("../../../public/DashboardIcon/trend-up.svg")}
 											alt="trend-up"
 										/>
 										<p className='font-medium text-[14px] leading-[21px] text-center text-[#067647]'>40%</p>
@@ -43,7 +43,7 @@ const EmployeeDashBoard = () => {
 							</div>
 							<div className='w-full h-[60%] mt-[10px]'>
 								<Image
-									src={require("../../public/DashboardIcon/Chartmini.svg")}
+									src={require("../../../public/DashboardIcon/Chartmini.svg")}
 									alt="trend-up"
 									className='w-full h-full'
 								/>
@@ -60,7 +60,7 @@ const EmployeeDashBoard = () => {
 
 									<div className='flex flex-row items-center gap-[8px]'>
 										<Image
-											src={require("../../public/DashboardIcon/trend-up.svg")}
+											src={require("../../../public/DashboardIcon/trend-up.svg")}
 											alt="trend-up"
 										/>
 										<p className='font-medium text-[14px] leading-[21px] text-center text-[#067647]'>40%</p>
@@ -70,7 +70,7 @@ const EmployeeDashBoard = () => {
 							</div>
 							<div className='w-full h-[60%] mt-[10px]'>
 								<Image
-									src={require("../../public/DashboardIcon/ChartminiRed.svg")}
+									src={require("../../../public/DashboardIcon/ChartminiRed.svg")}
 									alt="trend-up"
 									className='w-full h-full'
 								/>
@@ -89,7 +89,7 @@ const EmployeeDashBoard = () => {
 
 									<div className='flex flex-row items-center gap-[8px]'>
 										<Image
-											src={require("../../public/DashboardIcon/trend-up.svg")}
+											src={require("../../../public/DashboardIcon/trend-up.svg")}
 											alt="trend-up"
 										/>
 										<p className='font-medium text-[14px] leading-[21px] text-center text-[#067647]'>40%</p>
@@ -99,7 +99,7 @@ const EmployeeDashBoard = () => {
 							</div>
 							<div className='w-full  mt-2.5'>
 								<Image
-									src={require("../../public/DashboardIcon/Chartmini.svg")}
+									src={require("../../../public/DashboardIcon/Chartmini.svg")}
 									alt="trend-up"
 									className='w-full h-full'
 								/>
@@ -116,7 +116,7 @@ const EmployeeDashBoard = () => {
 
 									<div className='flex flex-row items-center gap-[8px]'>
 										<Image
-											src={require("../../public/DashboardIcon/trend-up.svg")}
+											src={require("../../../public/DashboardIcon/trend-up.svg")}
 											alt="trend-up"
 										/>
 										<p className='font-medium text-[14px] leading-[21px] text-center text-[#067647]'>40%</p>
@@ -126,7 +126,7 @@ const EmployeeDashBoard = () => {
 							</div>
 							<div className='w-full h-[60%] mt-[10px]'>
 								<Image
-									src={require("../../public/DashboardIcon/Chartmini.svg")}
+									src={require("../../../public/DashboardIcon/Chartmini.svg")}
 									alt="trend-up"
 									className='w-full h-full'
 								/>
@@ -145,7 +145,7 @@ const EmployeeDashBoard = () => {
 							</div>
 							<div>
 								<Image
-									src={require("../../public/DashboardIcon/megaphone.svg")}
+									src={require("../../../public/DashboardIcon/megaphone.svg")}
 									alt="megaphone"
 									className='w-[50px] h-[50px]'
 								/>
