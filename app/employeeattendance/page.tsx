@@ -130,35 +130,7 @@ const EmployeeDashBoard = () => {
 				</div>
 
 
-				{/* <div className="grid grid-cols-7 gap-[20px] mt-[24px]">
-					{calendarDays.map((day, index) => {
-						if (day === null) {
-							return <div key={`empty-${index}`} className="w-full h-[85px]" />;
-						}
 
-						const record = attendanceData[day];
-						const boxStyle = getStatusColor(record?.status || "");
-
-						const isToday =
-							day === today.getDate() &&
-							month === today.getMonth() &&
-							year === today.getFullYear();
-
-						return (
-							<div
-								key={day}
-								className={`flex flex-col justify-between p-[8px] w-full h-[85px] ${boxStyle} ${isToday ? 'ring-2 ring-yellow-400 font-bold bg-yellow-100' : ''}`}
-							>
-								<p className="text-[20px] leading-[150%] text-[#3A4050]">
-									{day}
-								</p>
-								<span className="text-[14px] text-[#3A4050] whitespace-nowrap">
-									{record ? record.time || "Absent" : ""}
-								</span>
-							</div>
-						);
-					})}
-				</div> */}
 				<div className="grid grid-cols-7 gap-2 sm:gap-[20px] mt-[24px] text-sm sm:text-base">
 					{calendarDays.map((day, index) => {
 						if (day === null) {
