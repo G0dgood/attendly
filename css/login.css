@@ -5,3 +5,224 @@
   background-repeat: no-repeat;
 		height: 100vh;
 }
+
+
+
+.btn-case {
+  background-color: var(--accent-white);
+  white-space: nowrap; 
+  padding: 4px 15px; 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  box-shadow: var(--box-shadow);
+ cursor: pointer;  
+ color: var(--accent-blue);
+ font-weight: bold;  
+ -webkit-transition: all 0.5s;
+ -moz-transition: all 0.5s;
+ transition: all 0.5s;
+}
+
+ 
+.btn-case.active {
+   background-color: var(--accent-white) !important;
+  /* border: 1px solid var(--accent-blue) !important; */
+  background-color: var(--accent-blue) !important;
+  color: var(--accent-white) !important;
+   color: var(--accent-blue);
+    border: 1px solid var(--accent-blue);  
+}
+
+ 
+#login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;  
+  gap: 4rem;
+  height: 100vh;  
+    background-image: url('../public/img/background.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed; 
+}
+
+.form-container_text{
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+
+.form-container_text h1{
+font-size: 30px !important;
+font-weight: 500 !important;
+color: var(--accent-blue) !important;
+}
+
+.form-container_text p{
+font-size: 14px;
+font-weight: 500;
+color: var(--accent-blue);
+}
+
+.img_licence-containers_login {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+.carousel-control-prev,
+.carousel-control-next {
+  display: none !important;
+}
+.carousel-item {
+  height: 100vh;
+}
+.carousel-item img {
+	height: 100%; 
+	filter: brightness(40%);
+	background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+  
+.logo-section {
+	grid-column: 2/5;
+}
+.logo-section div {
+	width: 17rem;
+}
+.logo-section p {
+ 	color: var(--accent-white);
+	font-size: large;
+	padding-left: 5rem;
+	font-style: italic;
+}
+
+.login-form-container {  
+	background-color: var(--accent-white) !important;
+	padding: 3rem !important;  
+	border-radius: 1rem !important; 
+  box-shadow: 0 1px 15px rgba(27,31,35,.15), 0 0 1px rgba(106,115,125,.35) !important;
+}
+
+.login-form-container > p:nth-child(1) {
+	font-weight: bold;
+	font-size: xx-large;
+	margin-bottom: 45px;
+}
+ 
+.login-form-container .form-ctrl i {
+	color: #5c5c5c;
+	position: absolute;
+	top: 30px;
+	right: 8px;
+	font-size: .9rem;
+	cursor: pointer;
+}
+.login-form-container .form-ctrl   {
+	 display: flex;
+   align-items: center;
+   gap: 15px;
+   border-bottom: 1.5px solid #C7C8C8;
+}
+.login-form-container :hover  {
+  border-color: var(--accent-blue) !important;  
+}
+.login-form-container .form-ctrl  svg {
+	color: var(--accent-blue);
+  font-size: 20px;
+}
+
+.login-form-container button {
+letter-spacing: 2px; 
+display: flex;
+justify-content: center;
+align-items: center;
+  background-color: var(--accent-blue) !important;
+  color: var(--accent-white) !important;
+  border-radius: 50px;
+  width: 100%;  
+  margin-top: 2rem;
+  padding: 15px;
+  font-weight: 300;
+  border: none;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.15), 0 0 2px rgba(0, 0, 0, 0.15),
+    0 0 16px rgba(218, 209, 209, 0.15);
+  transition: all 0.3s ease-out;
+  -webkit-transition: all 0.3s ease-out;
+}
+.login-form-container button:hover {
+  background-color: var(--accent-blue);
+}
+.login-form-container button:disabled {
+	cursor: normal;
+  background-color: var(--accent-blue-light);
+}
+
+.login-form-container .spinner-border-sm {
+	width: 1.25rem;
+	height: 1.25rem;
+	border-width: .15em;
+}
+.login-form-container button {
+    align-items: center;
+    border : none;
+    border-radius: 50px;
+    box-shadow: 0 0 1px #00000026, 0 0 2px #00000026, 0 0 16px #dad1d126;
+    color: var(--accent-white);
+    display: flex;
+    font-weight: 300;
+    justify-content: center;
+    letter-spacing: 2px;
+    margin-top: 2rem;
+    padding: 15px;
+    transition: all .3s ease-out;
+    -webkit-transition: all .3s ease-out;
+    width: 100%;
+}
+ 
+
+@media only screen and (max-width: 980px) {
+	.logo-section {
+		display: none;
+	} 
+	 .login-form-container { 
+    margin: 0 auto;   
+  }
+}
+
+.carousel-indicators{
+	display: none !important;
+}
+ 		.login-form-container .form-ctrl span #i-FaEye {
+    color: #5c5c5c !important;
+    cursor: pointer;
+    font-size: .9rem !important;
+    position: absolute;
+    right: 8px;
+    top: 30px;
+}
+
+.forgot_your_pass{
+  color: var(--accent-blue);
+  font-size: 14px;
+  font-weight:600;
+  cursor: pointer;
+}
+
+.create_fiPlus_icon{
+  display: flex;
+  align-self: center;
+  justify-content: flex-start;
+  gap: 15px;
+  white-space: nowrap!important;
+}
+
+.ssd_logo_login{
+  width: 50px;
+  height: 50px; 
+}
+
+ 

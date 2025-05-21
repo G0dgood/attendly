@@ -1,10 +1,10 @@
 import { useSession } from "next-auth/react";
 
 export function useUserPrivileges() {
-  const { data: session } = useSession();
-  console.log('session-session', session);
+  const { data: session } = useSession(); 
 
   const userType = session?.user?.role ?? null;
+  const userToken = session?.user?.token ?? null;
 
   const isSuperAdmin = userType === "SuperAdmin";
   const isAdmin = userType === "admin";
@@ -12,6 +12,7 @@ export function useUserPrivileges() {
   const isAgencyApprover = userType === "agency_approver";
   const isFinancialApprover = userType === "financial_approver";
   const isClient = userType === "client";
+  const token = userToken  
 
   return {
     isSuperAdmin,
@@ -20,5 +21,6 @@ export function useUserPrivileges() {
     isAgencyApprover,
     isFinancialApprover,
     isClient,
+    token,
   };
 }

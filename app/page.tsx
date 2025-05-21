@@ -1,142 +1,102 @@
+
 'use client';
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { SVGLoader } from "../components/SVGLoader";
-import { IoEyeSharp, IoEyeOffSharp } from "react-icons/io5";
+import React, { useEffect, useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FiMail, FiLock } from "react-icons/fi";
+// import ssd_logo from '../../assets/svg/ssd_logo.svg';
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useUserPrivileges } from "@/utils/userPrivileges";
+import { SVGLoader } from "@/components/SVGLoader";
+import { toast } from "sonner";
 
 
 
-export default function Home() {
+const Login = () => {
   const router = useRouter()
   const { isSuperAdmin } = useUserPrivileges();
-  const [visible, setVisible] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setpassword] = useState("");
+  const [password, setPassword] = React.useState<string>('');
+  const [showPassword, setShowPassword] = useState<any>(false);
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false, // VERY IMPORTANT
+      redirect: false,
       callbackUrl: "/dashboard",
     });
 
     setLoading(false);
 
     if (res?.ok) {
-
+      toast.success("Login successful!");
+      router.push('/dashboard');
     } else {
-      alert("Invalid email or password");
+      toast.error("Invalid email or password");
     }
   };
 
-
-  console.log('isSuperAdmin-isSuperAdmin', isSuperAdmin, isSuperAdmin)
-
-
   useEffect(() => {
     if (isSuperAdmin) {
-      router.push('/dashboard')
+      router.push('/dashboard');
     }
   }, [isSuperAdmin]);
 
 
   return (
-    <div className="image-container flex flex-col items-center justify-center h-screen ">
-
-
-      {/* <div className="w-[500px] border shadow-xl rounded-[10px] h-[500px] bg-[#FCFCFD] shadow-md rounded-md py-[64px] overflow-hidden">
-        <div className="  rounded-t-md px-[96px]">
-          <Image
-            src={require("../public/img/logo.png")}
-            alt="Logo"
-          />
-        </div>
-        <div className="flex flex-col  px-[160px] mt-[100px]">
-          <div className="flex flex-col gap-[8px] mb-[64px] w-[160px] h-[269px]">
-            <h1 className="tw-[180px] h-[36px] font-lato font-medium text-[24px]  text-[#3A4050]">Welcome Back</h1>
-            <p className="w-[180px] h-[24px] font-lato font-normal text-[16px]  text-[#6D7280]">Please Login to continue.</p>
-          </div>
-        </div> 
-      </div> */}
-      <div className="w-[420px] shadow-xl   p-[24px] bg-[#fff] ">
-        <div className="">
-          <Image
-            src={require("../public/img/logo.png")}
-            alt="Logo"
-          />
-        </div>
-        <div className="p-[20px]">
-          <div className="flex flex-col mb-[25px] w-[160px] mt-[20px] ">
-            <h1 className="tw-[180px] h-[36px]  font-medium text-[24px]  text-[#3A4050]">Welcome Back</h1>
-            <p className="w-[180px] h-[24px]  font-normal text-[16px]  text-[#6D7280]">Please Login to continue.</p>
-          </div>
-          {/* <h3 className="text-center text-[30px] font-medium">Welcome back!</h3>
-        <p className="text-center">
-          Log back in to have access to your media plans
-        </p> */}
-          <form onSubmit={handleSubmit} className=" space-y-[16px] flex flex-col gap-[20px]">
-            <div className="flex flex-col gap-[4px]">
-              <label htmlFor="" className="font-lato font-normal text-[14px]  text-[#3A4050]">Email Address</label>
-              <input
-                type="email"
-                className="p-[10px]   border w-full outline-none"
-                placeholder="example@gmail.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-[4px]">
-              <label htmlFor="" className="font-lato font-normal text-[14px]  text-[#3A4050]">Password</label>
-              <div className="relative">
-                <input
-                  type={visible ? "text" : "password"}
-                  className="p-[10px]   border w-full outline-none"
-                  placeholder="**********"
-                  required
-                  value={password}
-                  onChange={(e) => setpassword(e.target.value)}
-                />
-                <div
-                  className="absolute right-2 top-4 cursor-pointer"
-                  onClick={() => setVisible(!visible)}>
-                  {!visible ? <IoEyeSharp size={17} color="#fff" /> : <IoEyeOffSharp size={17} color="#fff" />}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-lato font-normal text-[14px]  text-[#3A4050]">Remember me</p>
-              </div>
-              <div>
-                <p className="font-lato font-normal text-[14px]  text-[#3A4050]">Forgot password?</p>
-              </div>
-            </div>
-            <button
-              // onClick={() => router.push('/dashboard')}
-              type="submit"
-              className=" text-[#fff] bold  w-full p-[10px] h-[40px] !bg-[#002DB3] text-[16px] font-semibold flex justify-center items-center"
-              disabled={loading}>
-              {loading ? <SVGLoader width={"20px"} height={"20px"} color={"#FFF"} /> : "Login"}
-            </button>
-          </form>
-        </div>
+    <div id="login-wrapper">
+      <div className='img_licence-containers_login'>
+        {/* <img src={ssd_logo} alt='icon' className='ssd_logo_login' /> */}
       </div>
+      <div className="login-form-container">
+        <div className="form-container_text">
+          <h1>Welcome back</h1>
+          <p>Enter your credentials to access your account.</p>
+        </div>
+        <form onSubmit={submitHandler}>
+          <div className="form-ctrl">
+            <FiMail />
+            <input
+              className="input-group"
+              type="text"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-ctrl">
+            <FiLock />
+            <input
+              className="input-group"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
+            <span id="i-FaEye" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
+          </div>
+
+          <button type="submit" className="login_btn cursor-pointer">
+            {loading ? <SVGLoader width={"20px"} height={"20px"} color={"#FFF"} /> : "Login"}
+          </button>
+        </form>
+      </div>
+      <div className="forgot_your_pass cursor-pointer">Forgot your password?</div>
     </div>
   );
-}
+};
 
-
+export default Login;
 
 
 

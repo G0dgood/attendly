@@ -15,7 +15,7 @@ const EmployeeDashBoard = () => {
 	const [displayData, setDisplayData] = useState<any[]>(dummyEmployees)
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const { data: session } = useSession();
-	console.log('session-session', session)
+
 
 
 
@@ -25,39 +25,34 @@ const EmployeeDashBoard = () => {
 			<PageHeader text={"Welcome back Jane "} />
 			<div className='flex flex-col md:flex-row gap-[24px] mt-[24px]'>
 				<StatsCards />
-				<div className='w-[100%] md:w-[30%]'>
-					<div className="flex flex-col items-start  justify-between gap-5 w-[100%]  bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] 
+				<div className='w-[100%] md:w-[30%] h-67'>
+					<div className="flex flex-col items-start h-full justify-between gap-5 w-[100%]  bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] 
 					p-[10px]">
-						<div className='flex flex-row justify-between   w-full '>
-							<div>
-								<h1 className=" font-medium text-[20px] leading-[150%] text-[#3A4050] ">Create Announcement</h1>
-								<p className=" font-normal text-[14px] leading-[150%] text-[#6D7280] ">Make an announcement to your co-workers</p>
-							</div>
-							<div>
+						<div className='flex flex-col justify-between w-full '>
+							<div className='h-60'>
 								<Image
-									src={require("../../public/DashboardIcon/megaphone.svg")}
+									src={require("../../public/Barcode.svg")}
 									alt="megaphone"
-									className='w-[50px] h-[50px]'
+									className='w-[100%] h-[100%]'
 								/>
 							</div>
 						</div>
-						<button className="box-border flex flex-row justify-center items-center px-4 py-2 gap-2 w-[171px] h-[40px] bg-white border border-[#002DB3] font-normal text-[14px] leading-[150%] text-[#002DB3] ">
-							Create announcement
-						</button>
 					</div>
 				</div>
-			</div>
+			</div >
 
-			<div className='mt-[50px] w-full'>
-				<h3>Employee Growth</h3>
+			<div className='mt-[40px] w-full'>
+				<h3>Employee Stats</h3>
 
-				<div className='mt-[20px] h-[315px] w-full bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] '>
-					<HRLineChart />
+				<div className='mt-[20px] h-[315px] w-full flex flex-col md:flex-row gap-[24px]'>
+					<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] w-[70%] h-full'>dd</div>
+					<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] w-[30%] h-full'>vv</div>
+					{/* <HRLineChart /> */}
 				</div>
 
 			</div>
 
-		</div>
+		</div >
 	)
 }
 

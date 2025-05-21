@@ -8,9 +8,11 @@ interface DateDropdownProps {
 	label: string;
 	islabelone?: string;
 	right?: string;
+	name: string; // key in the input object (e.g., "dateOfBirth")
+	handleOnChange: (name: string, value: string) => void;
 }
 
-const CustomDateDropdown = ({ label, islabelone }: DateDropdownProps) => {
+const CustomDateDropdown = ({ label, islabelone, name, handleOnChange }: DateDropdownProps) => {
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -18,7 +20,6 @@ const CustomDateDropdown = ({ label, islabelone }: DateDropdownProps) => {
 
 	const toggleDropdown = () => {
 		setIsOpen(!isOpen);
-		// Trigger click on native input when dropdown opens
 		setTimeout(() => inputRef.current?.showPicker?.(), 0);
 	};
 
@@ -30,6 +31,7 @@ const CustomDateDropdown = ({ label, islabelone }: DateDropdownProps) => {
 
 	const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSelectedDate(e.target.value);
+		handleOnChange(name, e.target.value);
 		setIsOpen(false);
 	};
 
@@ -39,7 +41,7 @@ const CustomDateDropdown = ({ label, islabelone }: DateDropdownProps) => {
 	}, []);
 
 	return (
-		<div className="relative w-full " ref={dropdownRef}>
+		<div className="relative w-full" ref={dropdownRef}>
 			{islabelone && (
 				<label className="font-medium text-[15px] leading-5 text-gray-600 mb-[6px] block">
 					{islabelone}
@@ -54,11 +56,10 @@ const CustomDateDropdown = ({ label, islabelone }: DateDropdownProps) => {
 					{selectedDate || label}
 				</span>
 				<span className="ml-auto text-gray-500">
-					<Image src={date} alt="down" />
+					<Image src={date} alt="calendar" />
 				</span>
 			</div>
 
-			{/* Hidden date input for native picker */}
 			<input
 				ref={inputRef}
 				type="date"

@@ -19,7 +19,6 @@ const Footer = () => {
 		{ label: "Dashboard", icon: dashboard, iconWhite: dashboardBlue, path: "/dashboard" },
 		{ label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/employee" },
 		{ label: "Attendance", icon: time, iconWhite: timeBlue, path: "/employeeattendance" },
-		{ label: "Performance Evaluation", icon: time, iconWhite: timeBlue, path: "/performanceevaluation/useperformanceevaluation" },
 	];
 
 

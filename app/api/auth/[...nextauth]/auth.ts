@@ -1,84 +1,3 @@
-// import { fetcher } from "@/utils/fetcher";
-// import axios from "axios";
-// import NextAuth, { User } from "next-auth";
-// import CredentialsProvider from "next-auth/providers/credentials";
-
-// export const authOptions = {
-//   providers: [
-//     CredentialsProvider({
-//       name: "Credentials",
-//       credentials: {
-//         email: { label: "Email", type: "email" },
-//         password: { label: "Password", type: "password" },
-//       },
-//       async authorize(credentials, req) {
-//         const { email, password } = credentials || {}
-
-//         try {
-//                   const response = await axios.post(
-//                     `${process.env.NEXT_PUBLIC_BASE_URL}/users/login`,
-//                      {
-//                         email: email,
-//                         password: password,
-//                       }, );
-        
-//                   console.log('response-response',response)
-//          if (response) {
-//                     return {
-//                       id: String(response.data.user.id),
-//                       name: response.data.user.username,
-//                       email: response.data.user.email,
-//                       data: response.data.data, // attach entire response if needed
-//                       randomKey: "Hey cool", // optional custom field
-//                     } as User & {
-//                       data: {
-//                         token: string;
-//                         user: {
-//                           id: number;
-//                           username: string;
-//                           email: string;
-//                         };
-//                       };
-//                       randomKey: string;
-//                     };
-//                   }
-//                   return null;
-//                 } catch (error) {
-//                   console.error("Authorize error:", error);
-//                   return null;
-//                 }
-//       },
-//     }),
-//   ],
-//   pages: {
-//     signIn: "/", // Optional custom login page
-//     error:"/"
-//   },
-//   session: {
-//     strategy: "jwt" as const, // Explicitly set the type to match SessionStrategy
-//   },
-// secret: `${process.env.NEXTAUTH_SECRET}`,
-//   callbacks: {
-//     async jwt({ token, user }: { token: any; user: any }) {
-//       if (user) {
-//         token.id = user.id;
-//         token.email = user.email ?? ""; // Ensure email is a string
-//       }
-//       return token;
-//     },
-//     async session({ session, token }: { session: any; token: any }) {
-//       console.log('session-session-session',session)
-//       if (token) {
-//         session.user.id = token.id;
-//         session.user.email = token.email;
-//       }
-//       return session;
-//     },
-//   },
-// };
-
- // app/api/auth/[...nextauth]/route.ts
-
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
@@ -120,9 +39,7 @@ export const authOptions: AuthOptions = {
               email: credentials?.email,
               password: credentials?.password,
             }
-          );
-
-          console.log('res-res--res',res)
+          ); 
 
           const { user, token } = res.data.data;
 
@@ -132,7 +49,7 @@ export const authOptions: AuthOptions = {
               email: user.email,
               token,
               role: user.role,
-              fullName: `${user.firstName} ${user.lastName}`,
+              fullName: `${user.name}`,
             };
           }
 

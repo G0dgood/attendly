@@ -4,6 +4,7 @@
 @import url(../css/SideNav.css);
 @import url(../css/table.css);
 @import url(../css/footer.css);
+@import url(../css/Form.css);
  
 
  
@@ -24,7 +25,7 @@
   --photo-background: #f4f4f4;
   --accent-black: #000;
   --accent-black-two: #05162e;
-  --accent-blue: #0866FF;
+  --accent-blue: #1d328d;
   --accent-green: #0ABF7E;
   --accent-background-blue: #eaf6ff;
   --second-text-color: #737373;
@@ -86,6 +87,7 @@ a {
 button:active {
   border: none;
   transform: scale(0.98) !important; 
+  border-radius: none;
 }
 
 button {
@@ -98,7 +100,7 @@ button {
 table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--accent-white); 
+  background: var(--accent-white) !important; 
   overflow-x: auto; 
   border: 1px solid #ddd;
 		border-radius: 8px !important;
@@ -131,11 +133,11 @@ th {
 }
 
 tbody tr:nth-child(even) {
-  background: #fff;
+  background: #fff !important;
 }
 
 tbody tr:hover {
-  background: #f9f9f9;
+  background: #f9f9f9 !important;
 }
 
 td {  

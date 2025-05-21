@@ -215,3 +215,10 @@
     display: none;
   }
 }
+
+#table-loader{
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  width: 100%  
+}

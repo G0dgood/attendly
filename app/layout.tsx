@@ -1,24 +1,29 @@
 import type { Metadata } from "next";
-import { Lato } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import NewProvider from "./utils/provider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/auth";
+import { Toaster } from "sonner";
 
-// Load fonts
-const lato = Lato({
+// Load Poppins font
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400"], // you can add other weights like "700" if needed
+  weight: ["400"], // Add other weights like "500", "700" if needed
 });
 
 export const metadata: Metadata = {
-  title: "U-Connect ERP",
-  description: "U-Connect is a Human Resource Consulting Company",
+  title: "EezyPass",
+  description: "Attendence Management System",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -27,12 +32,12 @@ export default function RootLayout({
           content="width=device-width, maximum-scale=1.0, user-scalable=no, initial-scale=1, shrink-to-fit=no"
         />
       </head>
-      <body className={`${lato.className} antialiased`}>
-        <NewProvider session={undefined}>
+      <body className={`${poppins.className} antialiased`}>
+        <Toaster />
+        <NewProvider session={session}>
           {children}
         </NewProvider>
       </body>
     </html>
   );
 }
-
