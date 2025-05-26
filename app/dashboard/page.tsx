@@ -163,7 +163,6 @@ const EmployeeDashBoard = () => {
 							</h3>
 							<button className='font-medium text-[14px] leading-[17px] text-[#2563EB]'>View All</button>
 						</div>
-
 						<AttendanceList />
 					</div>
 

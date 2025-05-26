@@ -8,8 +8,8 @@ import { SVGLoader } from "./SVGLoader";
 // SVGLoader Fetch
 const SVGLoaderFetch = ({ colSpan, text }: any) => (
   <tr>
-    <td colSpan={colSpan} className="w-full">
-      <div className="center-content">
+    <td colSpan={colSpan} className="h-[300px] p-0 m-auto">
+      <div className="center-content flex flex-col justify-center items-center h-full">
         <SVGLoader width={"40px"} height={"40px"} color={"#0866FF"} />
         <p className="mt-3">{text}</p>
       </div>
@@ -20,8 +20,8 @@ const SVGLoaderFetch = ({ colSpan, text }: any) => (
 // NoRecordFound
 const NoRecordFound = ({ colSpan }: any) => (
   <tr>
-    <td colSpan={colSpan} id="table-loader">
-      <div className="center-content">
+    <td colSpan={colSpan} className="h-[300px] p-0 m-auto">
+      <div className="center-content flex flex-col justify-center items-center h-full">
         <MdOutlineErrorOutline size={75} />
         <p id="mt-3">No record found</p>
       </div>

@@ -7,7 +7,7 @@ const AttendanceList = () => {
 	const { attendanceRecords, fetchAttendance, isLoading, error } = attendanceContext || {};
 
 
-
+	console.log('attendanceRecords', attendanceRecords)
 
 
 	useEffect(() => {
@@ -59,10 +59,10 @@ const AttendanceList = () => {
 
 								const employeeName = record.user?.name || 'N/A';
 								const employeeEmail = record.user?.email || '—';
-								const status = record.status || 'On Time'; // Default status if not present
+								const status = record?.status || 'On Time'; // Default status if not present
 
 								return (
-									<tr key={record.id}>
+									<tr key={record?.id}>
 										<td data-title='Full Name'>{employeeName}</td>
 										<td data-title='Email'>{employeeEmail}</td>
 										<td data-title='Check In'>{checkIn}</td>

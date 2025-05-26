@@ -48,7 +48,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 				},
 			});
 			setAttendanceRecords(res.data?.data || []);
-			setSuccess(true);
+			setIsLoading(true);
 		} catch (err) {
 			setError(err as unknown);
 		} finally {
@@ -93,7 +93,6 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 					},
 				}
 			);
-			setAttendanceRecords((prev) => [...prev, res.data.data]);
 			setSuccess(true);
 		} catch (err) {
 			setError(err);
@@ -113,9 +112,6 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 						Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_TOKEN}`,
 					},
 				}
-			);
-			setAttendanceRecords((prev) =>
-				prev.map((rec) => (rec.id === recordId ? { ...rec, status: newStatus } : rec))
 			);
 			setSuccess(true);
 		} catch (err) {

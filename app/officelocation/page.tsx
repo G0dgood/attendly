@@ -106,14 +106,37 @@ const Attendance = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{dataToRender?.length === 0 ? (
-								<SVGLoaderFetch colSpan={8} />
+							{isLoading ? (
+								<SVGLoaderFetch colSpan={6} />
 							) : dataToRender?.length === 0 ? (
-								<NoRecordFound colSpan={8} />
+								<NoRecordFound colSpan={6} />
 							) : (
 								dataToRender?.map((office) => (
 									<tr key={office.id}>
-										<td data-title="Office ID">{office.id}</td>
+										<td data-title="Office ID">
+											<button
+												onClick={() => {
+													navigator.clipboard.writeText(office.id);
+													toast.success("Copied Office ID to clipboard");
+												}}
+												className="cursor-pointer flex flex-row justify-center items-center px-[6px] py-[4px] w-[70px] h-[22px] 
+      border font-medium text-[12px] leading-[18px] 
+      bg-[#EFF6FF] border-[#93C5FD] text-[#1D4ED8] hover:bg-[#DBEAFE] transition"
+												title="Copy Office ID"
+											>
+												<span className="mr-1">Copy ID</span>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													className="h-3.5 w-3.5"
+													viewBox="0 0 20 20"
+													fill="currentColor"
+												>
+													<path d="M4 4a2 2 0 012-2h6a2 2 0 012 2v2h2a2 2 0 012 2v8a2 2 0 01-2 2h-6a2 2 0 01-2-2v-2H6a2 2 0 01-2-2V4z" />
+												</svg>
+											</button>
+										</td>
+
+
 										<td data-title="Name">{office.name}</td>
 										<td data-title="Address">{office.address}</td>
 										<td data-title="Created At">
