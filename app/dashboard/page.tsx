@@ -28,7 +28,7 @@ const EmployeeDashBoard = () => {
 
 
 
-	console.log("-attendanceRecords", attendanceRecords);
+
 
 
 
