@@ -10,6 +10,8 @@ declare module "next-auth" {
     token: string;
     role: string;
     fullName: string;
+    officeId: string;
+    phone: string;
   }
 
   interface Session {
@@ -19,6 +21,8 @@ declare module "next-auth" {
       token: string;
       role: string;
       fullName: string;
+      officeId: string;
+      phone: string;
     };
   }
 }
@@ -49,7 +53,9 @@ export const authOptions: AuthOptions = {
               email: user.email,
               token,
               role: user.role,
+              phone: user.phone,
               fullName: `${user.name}`,
+              officeId: user.officeId
             };
           }
 
@@ -77,6 +83,8 @@ export const authOptions: AuthOptions = {
         token.token = user.token;
         token.role = user.role;
         token.fullName = user.fullName;
+        token.officeId = user.officeId;
+        token.phone = user.phone;
       }
       return token;
     },
@@ -86,6 +94,8 @@ export const authOptions: AuthOptions = {
       session.user.token = token.token as string;
       session.user.role = token.role as string;
       session.user.fullName = token.fullName as string;
+      session.user.officeId = token.officeId as string;
+      session.user.phone = token.phone as string;
       return session;
     },
   },

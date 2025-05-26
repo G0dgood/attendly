@@ -1,11 +1,14 @@
 "use client";
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
 import Search from '@/components/Search'
 import Image from "next/image";
 import { useOfficeLocation } from '@/utils/OfficeLocationContext';
 import moment from "moment";
+import OfficeLocationModal from '@/components/modals/OfficeLocationModal';
+import { toast } from 'sonner';
+import OfficeLocationUpdateModal from '@/components/modals/OfficeLocationUpdateModal';
 
 
 const Attendance = () => {
@@ -19,7 +22,12 @@ const Attendance = () => {
 		success,
 		modalOpen,
 		setModalOpen,
+		successUpdate,
+		setSuccessUpdate,
+		setSuccess
 	} = useOfficeLocation()!;
+	const [isOpen, setIsOpen] = useState(false);
+
 
 	useEffect(() => {
 		fetchOfficeLocations();
@@ -31,7 +39,30 @@ const Attendance = () => {
 	];
 
 	console.log("Office Locations", officeLocations);
+	useEffect(() => {
+		if (success) {
+			toast.success("Office Locations Created!");
+			fetchOfficeLocations();
+			setSuccess(false)
+		} else if (successUpdate) {
+			toast.success("Office Locations Updated!");
+			fetchOfficeLocations();
 
+
+		}
+	}, [success, successUpdate]);
+
+	useEffect(() => {
+		if (
+			success || successUpdate
+		) {
+			const timer = setTimeout(() => {
+				setSuccess(false);
+				setSuccessUpdate(false)
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [success, successUpdate]);
 
 	return (
 		<div className='w-full'>
@@ -41,56 +72,64 @@ const Attendance = () => {
 				<Search />
 
 				<div className='flex flex-col md:flex-row gap-5'>
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050] !rounded-0">
+					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none">
 						<Image
 							src={require("../../public/icon/Filter_alt.svg")}
 							alt="search"
 						/>
 						Filter
 					</button>
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#002DB3]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] !rounded-0">
+					{/* <button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
 						Export
+					</button> */}
+
+					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
+						onClick={() => setIsOpen(true)}>
+						Create Office
 					</button>
 				</div>
 
 			</div>
 
-			<div id="table-container">
-				<div className="table-responsive-vertical">
-					<div className="table-container">
-						<table className="table">
-							<thead>
-								<tr>
-									<th>Office ID</th>
-									<th>Name</th>
-									<th>Address</th>
-									<th>Created At</th>
-									<th>Updated At</th>
-								</tr>
-							</thead>
-							<tbody>
-								{dataToRender?.length === 0 ? (
-									<SVGLoaderFetch colSpan={8} />
-								) : dataToRender?.length === 0 ? (
-									<NoRecordFound colSpan={8} />
-								) : (
-									dataToRender?.map((office) => (
-										<tr key={office.id}>
-											<td data-title="Office ID">{office.id}</td>
-											<td data-title="Name">{office.name}</td>
-											<td data-title="Address">{office.address}</td>
-											<td data-title="Created At">
-												{moment(office.createdAt).format("YYYY-MM-DD HH:mm")}
-											</td>
-											<td data-title="Updated At">
-												{moment(office.updatedAt).format("YYYY-MM-DD HH:mm")}
-											</td>
-										</tr>
-									))
-								)}
-							</tbody>
-						</table>
-					</div>
+
+			<div className="table-responsive-vertical">
+				<div className="table-container">
+					<table className="table">
+						<thead>
+							<tr>
+								<th>Office ID</th>
+								<th>Name</th>
+								<th>Address</th>
+								<th>Created At</th>
+								<th>Updated At</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{dataToRender?.length === 0 ? (
+								<SVGLoaderFetch colSpan={8} />
+							) : dataToRender?.length === 0 ? (
+								<NoRecordFound colSpan={8} />
+							) : (
+								dataToRender?.map((office) => (
+									<tr key={office.id}>
+										<td data-title="Office ID">{office.id}</td>
+										<td data-title="Name">{office.name}</td>
+										<td data-title="Address">{office.address}</td>
+										<td data-title="Created At">
+											{moment(office.createdAt).format("YYYY-MM-DD HH:mm")}
+										</td>
+										<td data-title="Updated At">
+											{moment(office.updatedAt).format("YYYY-MM-DD HH:mm")}
+										</td>
+										<td data-title="Updated">
+											<OfficeLocationUpdateModal id={office?.id} office={office} />
+										</td>
+									</tr>
+								))
+							)}
+						</tbody>
+					</table>
 				</div>
 			</div>
 
@@ -123,6 +162,7 @@ const Attendance = () => {
 					/>
 				</button>
 			</div>
+			<OfficeLocationModal isOpen={isOpen} setIsOpen={setIsOpen} />
 		</div>
 	)
 }

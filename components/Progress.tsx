@@ -8,7 +8,7 @@ const Progress = ({ progress }: ProgressProps) => {
 	return (
 		<div className="w-full h-[8px] bg-[#EAECF0] rounded-[4px] relative">
 			<div
-				className="h-[8px] bg-[#002DB3] rounded-[4px] absolute top-0 left-0"
+				className="h-[8px] bg-[#2563EB] rounded-[4px] absolute top-0 left-0"
 				style={{ width: `${progress}%` }}
 			/>
 		</div>

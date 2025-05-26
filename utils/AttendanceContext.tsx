@@ -2,11 +2,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useUserPrivileges } from "./userPrivileges";
+import { buildDynamicURL } from "@/shared/baseUrl";
 
 interface AttendanceContextType {
 	attendanceRecords: any[];
 	isLoading: boolean;
 	fetchAttendance: () => Promise<void>;
+	getCalender: any
 	addAttendance: (employeeId: any, date: any, status: any) => Promise<void>;
 	updateAttendance: (recordId: any, newStatus: any) => Promise<void>;
 	selectedEmployeeId: any;
@@ -54,6 +56,25 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 		}
 	};
 
+	const getCalender = async (params: any) => {
+		console.log('(params) ', params)
+		const url = buildDynamicURL(`${process.env.NEXT_PUBLIC_BASE_URL}/attendance`, {
+			page: params.page,
+			limit: params.limit,
+			filterByDate: params.filterByDate,
+			startDate: params.startDate,
+			endDate: params.endDate,
+		});
+
+		const { data } = await axios.get(url, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		// return data;
+	};
+
 	const addAttendance = async (employeeId: any, date: any, status: any) => {
 		setIsLoading(true);
 		try {
@@ -86,9 +107,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 		try {
 			await axios.put(
 				`${process.env.NEXT_PUBLIC_STRAPI_URL}/attendance/${recordId}`,
-				{
-					data: { status: newStatus },
-				},
+				{ status: newStatus },
 				{
 					headers: {
 						Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_TOKEN}`,
@@ -124,6 +143,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 				setModalOpen,
 				dateFilter,
 				setDateFilter,
+				getCalender
 			}}
 		>
 			{children}

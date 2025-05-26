@@ -2,14 +2,17 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import down from "../public/icon/down.svg";
-import Image from "next/image";
+import Image from 'next/image';
 
-// Support string or object options
-type Option = string | { id: string; name: string };
+interface LocationOption {
+	id: string;
+	name: string;
+	address: string;
+}
 
 interface CustomDropdownProps {
 	label: string;
-	options: Option[];
+	options: LocationOption[];
 	right?: string;
 	islabelone?: string;
 	name: string;
@@ -24,7 +27,7 @@ const CustomDropdown = ({
 	islabelone,
 	name,
 	handleOnChange,
-	loading = false,
+	loading = false
 }: CustomDropdownProps) => {
 	const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
@@ -34,14 +37,9 @@ const CustomDropdown = ({
 		if (!loading) setIsOpen(!isOpen);
 	};
 
-	const handleSelect = (option: Option) => {
-		if (typeof option === "string") {
-			setSelectedLabel(option);
-			handleOnChange(name, option);
-		} else {
-			setSelectedLabel(option.name);
-			handleOnChange(name, option.id);
-		}
+	const handleSelect = (option: LocationOption) => {
+		setSelectedLabel(option.name);
+		handleOnChange(name, option.id); // return the ID
 		setIsOpen(false);
 	};
 
@@ -65,8 +63,7 @@ const CustomDropdown = ({
 			)}
 
 			<div
-				className={`rounded-none box-border flex flex-row items-center px-[12px] py-[8px] gap-[8px] w-full h-[40px] bg-white border ${loading ? "border-gray-300" : "border-[#E5E7EB]"
-					} rounded cursor-pointer`}
+				className="rounded-none box-border flex flex-row items-center px-[12px] py-[8px] gap-[8px] w-full h-[40px] bg-white border border-[#E5E7EB] cursor-pointer"
 				onClick={toggleDropdown}
 			>
 				<span className="text-gray-600">
@@ -79,18 +76,15 @@ const CustomDropdown = ({
 
 			{isOpen && !loading && (
 				<div className="absolute w-full mt-2 p-[10px] z-10 bg-white border border-[#E5E7EB] shadow-lg max-h-[150px] overflow-auto">
-					{options?.map((option, i) => {
-						const label = typeof option === "string" ? option : option.name;
-						return (
-							<div
-								key={typeof option === "string" ? option : option.id}
-								className="p-1 text-[16px] text-[#344054] hover:bg-[#F9FAFB] hover:text-[#2563EB] cursor-pointer transition-colors duration-150"
-								onClick={() => handleSelect(option)}
-							>
-								{label}
-							</div>
-						);
-					})}
+					{options.map((option) => (
+						<div
+							key={option.id}
+							className="p-1 text-[16px] text-[#344054] hover:bg-[#F9FAFB] hover:text-[#2563EB] cursor-pointer transition-colors duration-150"
+							onClick={() => handleSelect(option)}
+						>
+							{option.name}
+						</div>
+					))}
 				</div>
 			)}
 		</div>
@@ -100,21 +94,21 @@ const CustomDropdown = ({
 interface DropdownsProps {
 	label: string;
 	right?: string;
-	options: Option[];
+	options: LocationOption[];
 	islabelone?: string;
 	name: string;
 	handleOnChange: (name: string, value: string) => void;
 	loading?: boolean;
 }
 
-const Dropdowns = ({
+const CustomDropdownOffice = ({
 	label,
 	right,
 	options,
 	islabelone,
 	name,
 	handleOnChange,
-	loading,
+	loading
 }: DropdownsProps) => {
 	return (
 		<CustomDropdown
@@ -129,4 +123,4 @@ const Dropdowns = ({
 	);
 };
 
-export default Dropdowns;
+export default CustomDropdownOffice;

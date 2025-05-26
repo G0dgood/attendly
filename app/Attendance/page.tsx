@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
 import Search from '@/components/Search'
-import { timeData } from '@/components/data';
 import Image from "next/image";
 import { useAttendance } from '@/utils/AttendanceContext';
 
@@ -12,10 +11,7 @@ import { useAttendance } from '@/utils/AttendanceContext';
 const Attendance = () => {
 	const attendanceContext: any = useAttendance();
 	const { attendanceRecords, fetchAttendance, isLoading, error } = attendanceContext || {};
-	const [displayData, setDisplayData] = useState<any[]>(timeData)
 
-
-	console.log("Attendance Records", attendanceRecords);
 
 	useEffect(() => {
 		if (fetchAttendance) {
@@ -38,83 +34,92 @@ const Attendance = () => {
 				<Search />
 
 				<div className='flex flex-col md:flex-row gap-5'>
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050] font-lato">
+					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none">
 						<Image
 							src={require("../../public/icon/Filter_alt.svg")}
 							alt="search"
 						/>
 						Filter
 					</button>
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#002DB3]  font-normal text-[14px] leading-[150%] text-[#FFFFFF]">
+					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
 						Export
 					</button>
 				</div>
 
 			</div>
 
-			<div id='table-container'>
-				<div className='table-responsive-vertical'>
-					<div className='table-container'>
-						<table className={true ? "table" : "table-hover table-mc-light-blue"}>
-							<thead>
-								<tr>
-									<th>Employee Name</th>
-									<th>Email</th>
-									<th>Check In</th>
-									<th>Check Out</th>
-									<th>Total Hour</th>
-									<th>Status</th>
-								</tr>
-							</thead>
-							<tbody>
-								{isLoading ? (
-									<SVGLoaderFetch colSpan={5} />
-								) : dataToRender?.length === 0 ? (
-									<NoRecordFound colSpan={5} />
-								) : (
-									dataToRender.map((record: any) => {
-										const checkInTime =
-											record.type === "CHECK_IN"
-												? new Date(record.timestamp).toLocaleTimeString()
-												: "—";
-										const checkOutTime =
-											record.type === "CHECK_OUT"
-												? new Date(record.timestamp).toLocaleTimeString()
-												: "—";
-										const employeeName = record.user?.name || "N/A";
-										const employeeEmail = record.user?.email || "—";
-										return (
-											<tr key={record._id}>
-												<td data-title='Full Name'>{employeeName}</td>
-												<td data-title='Email'>{employeeEmail}</td>
-												<td data-title='Date Uploaded'>{checkInTime}</td>
-												<td data-title='Last Name'>{checkOutTime}</td>
-												<td data-title='Email'>{record?.totalHour}</td>
-												<td data-title='Action'>
-													<div
-														className={`flex flex-row justify-center items-center px-[6px] py-[4px] w-[60px] h-[22px] 
-			  border font-medium text-[12px] leading-[18px] 
-			  ${record?.status === 'On Time'
-																? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
-																: record?.status === 'Late'
-																	? 'bg-[#FEF3F2] border-[#FECDCA] text-[#B42318]'
-																	: record?.status === 'Absent'
-																		? 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]'
-																		: record?.status === 'On Leave'
-																			? 'bg-[#F0F9FF] border-[#B9E6FE] text-[#026AA2]'
-																			: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
-															}`}
-													>
-														{record?.status || 'Absent'}
-													</div>
-												</td>
-											</tr>
-										);
-									})
-								)}
-							</tbody>
-						</table>
-					</div>
+
+			<div className='table-responsive-vertical'>
+				<div className='table-container'>
+					<table className={true ? "table" : "table-hover table-mc-light-blue"}>
+						<thead>
+							<tr>
+								<th>Employee Name</th>
+								<th>Email</th>
+								<th>Check In</th>
+								<th>Check Out</th>
+								<th>Total Hour</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							{isLoading ? (
+								<SVGLoaderFetch colSpan={6} />
+							) : dataToRender?.length === 0 ? (
+								<NoRecordFound colSpan={6} />
+							) : (
+								dataToRender.map((record: any) => {
+									const checkIn = record.clockIn
+										? new Date(record.clockIn).toLocaleTimeString()
+										: '—';
+									const checkOut = record.clockOut
+										? new Date(record.clockOut).toLocaleTimeString()
+										: '—';
+
+									const totalHour = record.clockIn && record.clockOut
+										? (
+											(new Date(record.clockOut).getTime() -
+												new Date(record.clockIn).getTime()) /
+											(1000 * 60 * 60)
+										).toFixed(2)
+										: '—';
+
+									const employeeName = record.user?.name || 'N/A';
+									const employeeEmail = record.user?.email || '—';
+									const status = record.status || 'On Time'; // Default status if not present
+
+									return (
+										<tr key={record.id}>
+											<td data-title='Full Name'>{employeeName}</td>
+											<td data-title='Email'>{employeeEmail}</td>
+											<td data-title='Check In'>{checkIn}</td>
+											<td data-title='Check Out'>{checkOut}</td>
+											<td data-title='Total Hour'>{totalHour}</td>
+											<td data-title='Status'>
+												<div
+													className={`whitespace-nowrap flex flex-row justify-center items-center px-[6px] py-[4px] w-[60px] h-[22px] 
+                border font-medium text-[12px] leading-[18px] 
+                ${status === 'On Time'
+															? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
+															: status === 'Late'
+																? 'bg-[#FEF3F2] border-[#FECDCA] text-[#B42318]'
+																: status === 'Absent'
+																	? 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]'
+																	: status === 'On Leave'
+																		? 'bg-[#F0F9FF] border-[#B9E6FE] text-[#026AA2]'
+																		: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
+														}`}
+												>
+													{status}
+												</div>
+											</td>
+										</tr>
+									);
+								})
+							)}
+						</tbody>
+					</table>
+
 				</div>
 			</div>
 

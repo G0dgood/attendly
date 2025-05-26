@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FiMail, FiLock } from "react-icons/fi";
-// import ssd_logo from '../../assets/svg/ssd_logo.svg';
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useUserPrivileges } from "@/utils/userPrivileges";
@@ -53,7 +52,21 @@ const Login = () => {
   return (
     <div id="login-wrapper">
       <div className='img_licence-containers_login'>
-        {/* <img src={ssd_logo} alt='icon' className='ssd_logo_login' /> */}
+        <div className="w-full flex">
+          <div className="flex items-center gap-2 font-semibold text-gray-900 ">
+            <div className="bg-[#2563EB] p-2 rounded-lg">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24" >
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 
+        2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 
+        16H5V10h14Zm0-11H5V5h14Z" />
+              </svg>
+            </div>
+            <span className="text-xl tracking-tight">Attendly</span>
+          </div>
+        </div>
       </div>
       <div className="login-form-container">
         <div className="form-container_text">
@@ -91,7 +104,7 @@ const Login = () => {
           </button>
         </form>
       </div>
-      <div className="forgot_your_pass cursor-pointer">Forgot your password?</div>
+      <div className="forgot_your_pass cursor-pointer"></div>
     </div>
   );
 };

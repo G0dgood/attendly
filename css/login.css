@@ -1,5 +1,5 @@
 .image-container {
-  background-image: url('../public/img/login.jpg');
+  background-image: url('../public/img/background.png');
   background-size: cover;  
   background-position: center;
   background-repeat: no-repeat;
@@ -57,19 +57,18 @@
 .form-container_text h1{
 font-size: 30px !important;
 font-weight: 500 !important;
-color: var(--accent-blue) !important;
+color: var(--accent-black) !important;
 }
 
 .form-container_text p{
 font-size: 14px;
 font-weight: 500;
-color: var(--accent-blue);
+color: var(--accent-black);
 }
 
 .img_licence-containers_login {
     display: flex;
-    align-items: center;
-    gap: 10px; 
+    align-items: center; 
 }
 .carousel-control-prev,
 .carousel-control-next {
@@ -206,7 +205,7 @@ align-items: center;
 }
 
 .forgot_your_pass{
-  color: var(--accent-blue);
+  color: var(--accent-black);
   font-size: 14px;
   font-weight:600;
   cursor: pointer;

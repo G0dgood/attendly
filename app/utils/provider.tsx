@@ -17,7 +17,7 @@ const NewProvider = ({ children, session }: React.PropsWithChildren<{ session: a
 		<SessionProvider session={session}>
 			<ProgressProvider
 				height="4px"
-				color="#002DB3"
+				color="#2563EB"
 				options={{ showSpinner: false }}
 				shallowRouting>
 				<Provider store={store}>

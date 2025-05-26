@@ -43,7 +43,7 @@ const Footer = () => {
 								width={24}
 								height={24}
 							/>
-							<span className={`text-xs font-medium ${isActive || isHovered ? "text-[#002DB3]" : "text-[#3A4050]"}`}>
+							<span className={`text-xs font-medium ${isActive || isHovered ? "text-[#2563EB]" : "text-[#3A4050]"}`}>
 								{item.label}
 							</span>
 						</Link>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface PageHeaderProps {
-	text: string;
+	text: any;
 	textsup?: string;
 	textsupSmall?: string;
 }

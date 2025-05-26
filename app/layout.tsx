@@ -13,8 +13,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "EezyPass",
+  title: "Attendly",
   description: "Attendence Management System",
+
 };
 
 export default async function RootLayout({

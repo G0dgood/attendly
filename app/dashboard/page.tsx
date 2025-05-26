@@ -1,53 +1,193 @@
 "use client";
 import React, { useEffect, useState } from 'react'
-import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
-import Search from '@/components/Search'
-import { dummyEmployees } from '@/components/data';
-import Image from "next/image";
-import HRLineChart from './component/HRLineChart';
 import { useSession } from 'next-auth/react';
 import StatsCards from './StatsCards';
+import CustomDateDropdown from '@/components/CustomDateDropdown';
+import AttendanceList from './component/AttendanceList';
+import Chart from './component/Chart';
+import { useAttendance } from '@/utils/AttendanceContext';
+import { toast } from 'sonner';
+import { useUserContext } from '@/utils/UserContext';
+import QrScanner from './component/QrScanner';
+import { useOfficeLocation } from '@/utils/OfficeLocationContext';
+import Dropdowns from '@/components/CustomDropdown';
+import { SVGLoader } from '@/components/SVGLoader';
 
 
 
 const EmployeeDashBoard = () => {
-	const [displayData, setDisplayData] = useState<any[]>(dummyEmployees)
-	const [isLoading, setIsLoading] = useState<boolean>(false)
-	const { data: session } = useSession();
+	const { data: session }: any = useSession();
+	const { attendanceRecords, fetchAttendance, isLoading, error, getCalender }: any = useAttendance();
+	const { users, fetchUsers, qrToken, isLoadingQR, successQR, setSuccessQR, dataQR }: any = useUserContext();
+	const { officeLocations, isLoading: newisLoading, fetchOfficeLocations } = useOfficeLocation()!;
+	const [inputs, setInputs] = useState({
+		officeId: "",
+		type: ""
+	});
 
 
 
+	console.log("-attendanceRecords", attendanceRecords);
+
+
+
+
+
+	useEffect(() => {
+		if (successQR) {
+			toast.success("QR Create!");
+			setSuccessQR(false)
+		}
+	}, [successQR]);
+
+
+	useEffect(() => {
+		setInputs(prev => ({
+			...prev,
+			officeId: session.user.officeId,
+		}));
+	}, [session.user.officeId]);
+
+	// Merge API data with mock "soner"
+	const employee = [
+		...(users?.users || users || [])
+	];
+	// Merge API data with mock "soner"
+	const attendanceRecord = [
+		...(attendanceRecords?.data?.data || attendanceRecords || [])
+	];
+
+
+
+
+
+	useEffect(() => {
+		const controller = new AbortController();
+
+		const fetchData = async () => {
+			try {
+				await fetchUsers();
+				await fetchAttendance();
+				await fetchOfficeLocations();
+			} catch (error: any) {
+				toast.error(error.message);
+			}
+		};
+
+		fetchData();
+
+		return () => {
+
+			controller.abort();
+		};
+	}, []);
+
+
+
+
+	const handleOnChange = (input: string, value: string) => {
+		setInputs((prevState) => ({
+			...prevState,
+			[input]: value,
+		}));
+	};
+
+	// Merge API data with mock "soner"
+	const locationOptions = [
+		...(officeLocations?.data || officeLocations || [])
+	];
+
+
+	const handleSubmit = () => {
+
+		qrToken(inputs)
+	}
+
+	const handleSubmits = () => {
+		getCalender({
+			page: 1,
+			limit: 50,
+			filterByDate: 'range',
+			startDate: '2025-05-01',
+			endDate: '2025-05-30',
+		})
+	}
 
 
 	return (
 		<div className='w-full'>
-			<PageHeader text={"Welcome back Jane "} />
-			<div className='flex flex-col md:flex-row gap-[24px] mt-[24px]'>
-				<StatsCards />
-				<div className='w-[100%] md:w-[30%] h-67'>
-					<div className="flex flex-col items-start h-full justify-between gap-5 w-[100%]  bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] 
-					p-[10px]">
-						<div className='flex flex-col justify-between w-full '>
-							<div className='h-60'>
-								<Image
-									src={require("../../public/Barcode.svg")}
-									alt="megaphone"
-									className='w-[100%] h-[100%]'
-								/>
-							</div>
-						</div>
-					</div>
+			<div className='flex flex-col md:flex-row justify-between'>
+				<div className='w-[100%] md:w-[50%]'>
+					<PageHeader text={"Dashboard Overview"} />
+				</div>
+				<div className='flex flex-row gap-2 w-[100%]  md:w-[27%] pt-[20px] md:p-[0px]'>
+					<Dropdowns
+						label="Clock Type"
+						options={["CHECK_IN", "CHECK_OUT"]}
+						name="type"
+						handleOnChange={handleOnChange}
+					/>
+					<button
+						className={`flex flex-row justify-center items-center px-[6px] py-[4px] h-[40px] w-[150px]   border font-medium text-[12px] leading-[18px]  
+												  !bg-[#2563EB] border-[#B9E6FE] text-[#fff] rounded-none
+									`}
+						onClick={handleSubmit}
+					>
+						{isLoadingQR ? (
+							<SVGLoader width="20px" height="30px" color="#FFF" />
+						) : (
+							"Create"
+						)}
+
+					</button>
+				</div>
+			</div>
+			<div className='flex flex-col md:flex-row gap-[24px] mt-[24px]  '>
+				<StatsCards
+					attendanceRecords={attendanceRecord}
+					users={employee}
+				/>
+				<div className='w-[100%] md:w-[30%] h-full md:h-[345px] flex flex-col gap-2'>
+					<QrScanner dataQR={dataQR} />
+
 				</div>
 			</div >
 
 			<div className='mt-[40px] w-full'>
-				<h3>Employee Stats</h3>
+				<div className=' mt-[20px] h-[350px] w-full flex flex-col md:flex-row gap-[24px]'>
+					<div className='w-full md:w-[70%] h-full'>
+						<div className='flex flex-row  justify-between mb-8'>
+							<h3 className="font-montserrat font-medium text-[20px] leading-6 text-[#141414] flex items-center order-0 flex-none grow-0">
+								Attendance list
+							</h3>
+							<button className='font-medium text-[14px] leading-[17px] text-[#2563EB]'>View All</button>
+						</div>
 
-				<div className='mt-[20px] h-[315px] w-full flex flex-col md:flex-row gap-[24px]'>
-					<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] w-[70%] h-full'>dd</div>
-					<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] w-[30%] h-full'>vv</div>
-					{/* <HRLineChart /> */}
+						<AttendanceList />
+					</div>
+
+					<div className='w-full md:w-[30%] h-full '>
+						<div className='flex flex-row justify-between mb-4'>
+							<div />
+							<div className='w-[40%]'>
+								<CustomDateDropdown label={''} name={''} handleOnChange={handleOnChange} />
+							</div>
+						</div>
+
+						<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)]  w-full h-full '>
+							{/* <button
+								className={`flex flex-row justify-center items-center px-[6px] py-[4px] h-[40px] w-[150px]   border font-medium text-[12px] leading-[18px]  
+												  !bg-[#2563EB] border-[#B9E6FE] text-[#fff] rounded-none
+									`}
+								onClick={handleSubmits}
+							>
+
+								Create ffff
+							</button> */}
+							<Chart chartdata={attendanceRecord} />
+						</div>
+					</div>
 				</div>
 
 			</div>

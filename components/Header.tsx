@@ -8,7 +8,7 @@ const Header = () => {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  console.log('session-session', session)
+
 
   const userInitials =
     session?.user?.email
@@ -22,10 +22,7 @@ const Header = () => {
       <div></div>
 
       <div className="flex items-center gap-[20px] relative">
-        <Image
-          src={require("../public/DashboardIcon/Bell_light.svg")}
-          alt="bell"
-        />
+
 
         <div
           className="flex items-center gap-[10px] cursor-pointer"
@@ -55,8 +52,12 @@ const Header = () => {
                 {session?.user?.email || "mike@example.com"}
               </p>
               <button
-                onClick={() => signOut()}
-                className="w-full px-4 py-2 text-sm text-white !bg-[#002DB3]   hover:bg-blue-700"
+                onClick={async () => {
+                  await signOut({
+                    callbackUrl: "/",
+                  })
+                }}
+                className="w-full px-4 py-2 text-sm text-white !bg-[#2563EB]   hover:bg-blue-700 rounded-none"
               >
                 Sign out
               </button>

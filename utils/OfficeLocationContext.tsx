@@ -21,10 +21,17 @@ interface OfficeLocationContextType {
 	setSelectedOfficeId: React.Dispatch<React.SetStateAction<string | null>>;
 	error: unknown;
 	setError: React.Dispatch<React.SetStateAction<unknown>>;
-	success: boolean | null;
-	setSuccess: React.Dispatch<React.SetStateAction<boolean | null>>;
+	success: boolean;
+	successUpdate: boolean;
+	officeLocationsError: any;
 	modalOpen: boolean;
 	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setSuccessUpdate: React.Dispatch<React.SetStateAction<boolean>>;
+	setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsLoadingCreate: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsLoadingUpdate: React.Dispatch<React.SetStateAction<boolean>>;
+	isLoadingCreate: boolean;
+	isLoadingUpdate: boolean;
 }
 
 const OfficeLocationContext = createContext<OfficeLocationContextType | null>(null);
@@ -34,10 +41,14 @@ export const useOfficeLocation: any = () => useContext(OfficeLocationContext);
 export const OfficeLocationProvider = ({ children }: { children: React.ReactNode }) => {
 	const { token } = useUserPrivileges();
 	const [officeLocations, setOfficeLocations] = useState<Office[]>([]);
+	const [officeLocationsError, setOfficeLocationsError] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingCreate, setIsLoadingCreate] = useState(false);
+	const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
 	const [selectedOfficeId, setSelectedOfficeId] = useState<string | null>(null);
 	const [error, setError] = useState<unknown>(null);
-	const [success, setSuccess] = useState<boolean | null>(null);
+	const [success, setSuccess] = useState<boolean>(false);
+	const [successUpdate, setSuccessUpdate] = useState<boolean>(false);
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const fetchOfficeLocations = async () => {
@@ -49,7 +60,7 @@ export const OfficeLocationProvider = ({ children }: { children: React.ReactNode
 				},
 			});
 			setOfficeLocations(res?.data?.data || []);
-			setSuccess(true);
+			setIsLoading(true);
 		} catch (err) {
 			setError(err);
 		} finally {
@@ -58,7 +69,7 @@ export const OfficeLocationProvider = ({ children }: { children: React.ReactNode
 	};
 
 	const addOfficeLocation = async (name: string, address: string) => {
-		setIsLoading(true);
+		setIsLoadingCreate(true);
 		try {
 			const res = await axios.post(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/office-location`,
@@ -69,37 +80,33 @@ export const OfficeLocationProvider = ({ children }: { children: React.ReactNode
 					},
 				}
 			);
-			setOfficeLocations((prev) => [...prev, res.data?.data]);
 			setSuccess(true);
+			setIsLoadingCreate(false);
 		} catch (err) {
 			setError(err);
 		} finally {
-			setIsLoading(false);
+			setIsLoadingCreate(false);
 		}
 	};
 
-	const updateOfficeLocation = async (officeId: string, updatedData: Partial<Office>) => {
-		setIsLoading(true);
+	const updateOfficeLocation = async (id: string, inputs: any) => {
+		setIsLoadingUpdate(true);
 		try {
-			const res = await axios.put(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/office-location/${officeId}`,
-				updatedData,
+			axios.patch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/office-location/${id}`,
+				inputs,
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
 				}
 			);
-			setOfficeLocations((prev) =>
-				prev.map((office) =>
-					office.id === officeId ? { ...office, ...updatedData } : office
-				)
-			);
-			setSuccess(true);
-		} catch (err) {
-			setError(err);
+			setSuccessUpdate(true);
+			setIsLoadingUpdate(false);
+		} catch (err: any) {
+			setOfficeLocationsError(err)
 		} finally {
-			setIsLoading(false);
+			setIsLoadingUpdate(false);
 		}
 	};
 
@@ -119,6 +126,13 @@ export const OfficeLocationProvider = ({ children }: { children: React.ReactNode
 				setSuccess,
 				modalOpen,
 				setModalOpen,
+				setSuccessUpdate,
+				successUpdate,
+				isLoadingCreate,
+				isLoadingUpdate,
+				setIsLoadingCreate,
+				setIsLoadingUpdate,
+				officeLocationsError
 			}}
 		>
 			{children}

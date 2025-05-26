@@ -49,7 +49,7 @@ const CustomDateDropdown = ({ label, islabelone, name, handleOnChange }: DateDro
 			)}
 
 			<div
-				className="box-border flex flex-row items-center px-[12px] py-[8px] gap-[8px] w-full h-[40px] bg-white border border-[#E5E7EB] rounded cursor-pointer"
+				className="box-border flex flex-row items-center px-[12px] py-[8px] gap-[8px] w-full h-[40px] bg-white border border-[#E5E7EB] rounded-none cursor-pointer"
 				onClick={toggleDropdown}
 			>
 				<span className="text-gray-600 text-sm">

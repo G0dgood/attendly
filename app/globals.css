@@ -5,6 +5,7 @@
 @import url(../css/table.css);
 @import url(../css/footer.css);
 @import url(../css/Form.css);
+@import url(../css/button.css);
  
 
  
@@ -25,7 +26,7 @@
   --photo-background: #f4f4f4;
   --accent-black: #000;
   --accent-black-two: #05162e;
-  --accent-blue: #1d328d;
+  --accent-blue: #2563EB;
   --accent-green: #0ABF7E;
   --accent-background-blue: #eaf6ff;
   --second-text-color: #737373;
@@ -87,7 +88,7 @@ a {
 button:active {
   border: none;
   transform: scale(0.98) !important; 
-  border-radius: none;
+  border-radius: none !important;
 }
 
 button {

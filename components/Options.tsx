@@ -8,10 +8,9 @@ import { SVGLoader } from "./SVGLoader";
 // SVGLoader Fetch
 const SVGLoaderFetch = ({ colSpan, text }: any) => (
   <tr>
-    <td colSpan={colSpan} id="table-loader">
+    <td colSpan={colSpan} className="w-full">
       <div className="center-content">
         <SVGLoader width={"40px"} height={"40px"} color={"#0866FF"} />
-
         <p className="mt-3">{text}</p>
       </div>
     </td>
