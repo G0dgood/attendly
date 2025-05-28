@@ -6,25 +6,32 @@ const AttendanceList = () => {
 	const attendanceContext: any = useAttendance();
 	const { attendanceRecords, fetchAttendance, isLoading, error } = attendanceContext || {};
 
-
-	console.log('attendanceRecords', attendanceRecords)
-
-
 	useEffect(() => {
 		if (fetchAttendance) {
 			fetchAttendance();
 		}
 	}, []);
 
-
-	// Merge API data with mock "soner"
+	// Merge API data
 	const dataToRender = [
 		...(attendanceRecords?.data?.data || attendanceRecords || [])
 	];
+
+	// Determine status based on clockIn time
+	const getStatus = (clockIn: string | null) => {
+		if (!clockIn) return 'Absent';
+
+		const clockInDate = new Date(clockIn);
+		const cutoffDate = new Date(clockInDate);
+		cutoffDate.setHours(8, 0, 0, 0); // Set to 8:00 AM
+
+		return clockInDate > cutoffDate ? 'Late' : 'On Time';
+	};
+
 	return (
 		<div className='table-responsive-vertical'>
 			<div className='table-container'>
-				<table className={true ? "table" : "table-hover table-mc-light-blue"}>
+				<table className='table'>
 					<thead>
 						<tr>
 							<th>Employee Name</th>
@@ -59,7 +66,16 @@ const AttendanceList = () => {
 
 								const employeeName = record.user?.name || 'N/A';
 								const employeeEmail = record.user?.email || '—';
-								const status = record?.status || 'On Time'; // Default status if not present
+								const status = getStatus(record?.clockIn || null);
+
+								// Dynamic style based on status
+								const statusStyle = {
+									'On Time': 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]',
+									'Late': 'bg-[#FEF3F2] border-[#FECDCA] text-[#B42318]',
+									'Absent': 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]',
+									'On Leave': 'bg-[#F0F9FF] border-[#B9E6FE] text-[#026AA2]',
+									'Unknown': 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
+								}[status] || 'bg-gray-100 text-gray-600';
 
 								return (
 									<tr key={record?.id}>
@@ -71,17 +87,7 @@ const AttendanceList = () => {
 										<td data-title='Status'>
 											<div
 												className={`whitespace-nowrap flex flex-row justify-center items-center px-[6px] py-[4px] w-[60px] h-[22px] 
-                border font-medium text-[12px] leading-[18px] 
-                ${status === 'On Time'
-														? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
-														: status === 'Late'
-															? 'bg-[#FEF3F2] border-[#FECDCA] text-[#B42318]'
-															: status === 'Absent'
-																? 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]'
-																: status === 'On Leave'
-																	? 'bg-[#F0F9FF] border-[#B9E6FE] text-[#026AA2]'
-																	: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
-													}`}
+													border font-medium text-[12px] leading-[18px] ${statusStyle}`}
 											>
 												{status}
 											</div>
@@ -92,10 +98,9 @@ const AttendanceList = () => {
 						)}
 					</tbody>
 				</table>
-
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default AttendanceList
+export default AttendanceList;

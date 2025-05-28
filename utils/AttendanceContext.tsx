@@ -10,12 +10,18 @@ interface AttendanceContextType {
 	fetchAttendance: () => Promise<void>;
 	getCalender: any
 	addAttendance: (employeeId: any, date: any, status: any) => Promise<void>;
+	addAttendanceManual: (input: any) => Promise<void>;
 	updateAttendance: (recordId: any, newStatus: any) => Promise<void>;
 	selectedEmployeeId: any;
 	setSelectedEmployeeId: React.Dispatch<React.SetStateAction<any>>;
+	setErrorAttendance: React.Dispatch<React.SetStateAction<any>>;
+	setSuccessAttendance: React.Dispatch<React.SetStateAction<any>>;
 	error: unknown;
+	errorAttendance: unknown;
+	isLoadingAttendance: unknown;
 	setError: React.Dispatch<React.SetStateAction<unknown>>;
 	success: boolean | null;
+	successAttendance: boolean | null;
 	setSuccess: React.Dispatch<React.SetStateAction<boolean | null>>;
 	modalOpen: boolean;
 	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,9 +37,12 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 	const { token } = useUserPrivileges();
 	const [attendanceRecords, setAttendanceRecords] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingAttendance, setIsLoadingAttendance] = useState(false);
 	const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 	const [error, setError] = useState<unknown>(null);
+	const [errorAttendance, setErrorAttendance] = useState<unknown>(null);
 	const [success, setSuccess] = useState<boolean | null>(null);
+	const [successAttendance, setSuccessAttendance] = useState<boolean | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [dateFilter, setDateFilter] = useState(null);
 
@@ -101,6 +110,28 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 		}
 	};
 
+	const addAttendanceManual = async (input: any) => {
+		setIsLoadingAttendance(true);
+		try {
+			const res = await axios.post(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/attendance/manual`, input,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			setSuccessAttendance(true);
+			setIsLoadingAttendance(false);
+		} catch (err: any) {
+			const errors =
+				err.response?.data?.errors?.[0]?.message ?? err.message;
+			setErrorAttendance(errors);
+		} finally {
+			setIsLoadingAttendance(false);
+		}
+	};
+
 	const updateAttendance = async (recordId: any, newStatus: any) => {
 		setIsLoading(true);
 		try {
@@ -109,7 +140,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 				{ status: newStatus },
 				{
 					headers: {
-						Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_TOKEN}`,
+						Authorization: `Bearer ${token}`,
 					},
 				}
 			);
@@ -139,7 +170,13 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 				setModalOpen,
 				dateFilter,
 				setDateFilter,
-				getCalender
+				getCalender,
+				successAttendance,
+				errorAttendance,
+				isLoadingAttendance,
+				addAttendanceManual,
+				setErrorAttendance,
+				setSuccessAttendance
 			}}
 		>
 			{children}

@@ -19,6 +19,7 @@ interface UserContextType {
 	success: boolean;
 	createSuccess: boolean;
 	isLoadingCreate: boolean;
+	isLoadingQR: boolean;
 	modalOpen: boolean;
 	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	searchQuery: string;
@@ -134,10 +135,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 			const qrData = res.data.data;
 
-			// Save to localStorage
-			// localStorage.setItem("qrTokenData", JSON.stringify(qrData));
+
 			setDataQR(qrData)
 			setSuccessQR(true);
+			setIsLoadingQR(false);
 		} catch (err: any) {
 			const errors = err.response?.data?.errors?.[0]?.message ?? err.message;
 			setError(errors);
@@ -173,7 +174,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 				createSuccess,
 				isLoadingCreate,
 				setIsLoadingCreate,
-				setSuccessQR
+				setSuccessQR,
+				isLoadingQR
 			}}
 		>
 			{children}

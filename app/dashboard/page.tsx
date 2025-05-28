@@ -13,10 +13,12 @@ import QrScanner from './component/QrScanner';
 import { useOfficeLocation } from '@/utils/OfficeLocationContext';
 import Dropdowns from '@/components/CustomDropdown';
 import { SVGLoader } from '@/components/SVGLoader';
+import { useRouter } from 'next/navigation';
 
 
 
 const EmployeeDashBoard = () => {
+	const router = useRouter();
 	const { data: session }: any = useSession();
 	const { attendanceRecords, fetchAttendance, isLoading, error, getCalender }: any = useAttendance();
 	const { users, fetchUsers, qrToken, isLoadingQR, successQR, setSuccessQR, dataQR }: any = useUserContext();
@@ -26,12 +28,7 @@ const EmployeeDashBoard = () => {
 		type: ""
 	});
 
-
-
-
-
-
-
+	console.log("officeLocations-dataQR", dataQR);
 
 
 	useEffect(() => {
@@ -93,10 +90,7 @@ const EmployeeDashBoard = () => {
 		}));
 	};
 
-	// Merge API data with mock "soner"
-	const locationOptions = [
-		...(officeLocations?.data || officeLocations || [])
-	];
+
 
 
 	const handleSubmit = () => {
@@ -133,13 +127,9 @@ const EmployeeDashBoard = () => {
 												  !bg-[#2563EB] border-[#B9E6FE] text-[#fff] rounded-none
 									`}
 						onClick={handleSubmit}
+						disabled={isLoadingQR}
 					>
-						{isLoadingQR ? (
-							<SVGLoader width="20px" height="30px" color="#FFF" />
-						) : (
-							"Create"
-						)}
-
+						Create
 					</button>
 				</div>
 			</div>
@@ -149,7 +139,7 @@ const EmployeeDashBoard = () => {
 					users={employee}
 				/>
 				<div className='w-[100%] md:w-[30%] h-full md:h-[345px] flex flex-col gap-2'>
-					<QrScanner dataQR={dataQR} />
+					<QrScanner dataQR={dataQR} isLoadingQR={isLoadingQR} />
 
 				</div>
 			</div >
@@ -161,7 +151,13 @@ const EmployeeDashBoard = () => {
 							<h3 className="font-montserrat font-medium text-[20px] leading-6 text-[#141414] flex items-center order-0 flex-none grow-0">
 								Attendance list
 							</h3>
-							<button className='font-medium text-[14px] leading-[17px] text-[#2563EB]'>View All</button>
+							<button
+								onClick={() => router.push('/attendances')}
+								className="font-medium text-[14px] leading-[17px] text-[#2563EB] cursor-pointer	flex items-center order-1 flex-none grow-0 px-4 py-2 bg-white   "
+							>
+								View All
+							</button>
+
 						</div>
 						<AttendanceList />
 					</div>
