@@ -14,7 +14,7 @@ const AttendanceList = () => {
 
 	// Merge API data
 	const dataToRender = [
-		...(attendanceRecords?.data?.data || attendanceRecords || [])
+		...(attendanceRecords?.data?.data || attendanceRecords || []).slice(0, 6)
 	];
 
 	// Determine status based on clockIn time
@@ -29,13 +29,12 @@ const AttendanceList = () => {
 	};
 
 	return (
-		<div className='table-responsive-vertical'>
+		<div className='table-responsive-vertical h-85'>
 			<div className='table-container'>
 				<table className='table'>
 					<thead>
 						<tr>
-							<th>Employee Name</th>
-							<th>Email</th>
+							<th>Name</th>
 							<th>Check In</th>
 							<th>Check Out</th>
 							<th>Total Hour</th>
@@ -79,8 +78,8 @@ const AttendanceList = () => {
 
 								return (
 									<tr key={record?.id}>
-										<td data-title='Full Name'>{employeeName}</td>
-										<td data-title='Email'>{employeeEmail}</td>
+										<td data-title='Full Name' className='whitespace-nowrap'>{employeeName}</td>
+										{/* <td data-title='Email'>{employeeEmail}</td> */}
 										<td data-title='Check In'>{checkIn}</td>
 										<td data-title='Check Out'>{checkOut}</td>
 										<td data-title='Total Hour'>{totalHour}</td>

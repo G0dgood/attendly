@@ -2,18 +2,23 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useUserPrivileges } from "./userPrivileges";
+import { buildDynamicURL } from "@/shared/baseUrl";
 
 interface UserContextType {
 	users: any[];
 	successQR: any;
 	dataQR: any;
+	usersParams: any;
 	isLoading: boolean;
+	isLoadingparams: boolean;
 	fetchUsers: () => Promise<void>;
+	fetchUsersParams: any;
 	qrToken: any;
 	addUser: (userData: any) => Promise<void>;
 	updateUser: (userId: any, updatedData: any) => Promise<void>;
 	selectedUserId: any;
 	setSelectedUserId: React.Dispatch<React.SetStateAction<any>>;
+	setUsersParams: React.Dispatch<React.SetStateAction<any>>;
 	error: unknown;
 	setError: React.Dispatch<React.SetStateAction<unknown>>;
 	success: boolean;
@@ -38,9 +43,11 @@ export const useUserContext = () => useContext(UserContext);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 	const { token } = useUserPrivileges();
 	const [users, setUsers] = useState<any[]>([]);
+	const [usersParams, setUsersParams] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLoadingCreate, setIsLoadingCreate] = useState(false);
 	const [isLoadingQR, setIsLoadingQR] = useState(false);
+	const [isLoadingparams, setIsLoadingparams] = useState(false);
 	const [selectedUserId, setSelectedUserId] = useState(null);
 	const [error, setError] = useState<unknown>(null);
 	const [success, setSuccess] = useState<boolean>(false);
@@ -64,6 +71,38 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 			setError(err);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const fetchUsersParams = async (params: any) => {
+		setIsLoadingparams(true);
+		const url = buildDynamicURL(`${process.env.NEXT_PUBLIC_BASE_URL}/users`, {
+			page: params?.page,
+			limit: params?.limit,
+			filterByDate: params?.filterByDate,
+			startDate: params?.startDate,
+			endDate: params?.endDate,
+		});
+		try {
+			const { data } = await axios.get(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			// try {
+			// 	const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/users`, {
+			// 		headers: {
+			// 			Authorization: `Bearer ${token}`,
+			// 		},
+			// 	});
+			setUsersParams(data?.data || []);
+			setIsLoadingparams(false);
+		} catch (err: any) {
+			const errors =
+				err.response?.data?.errors?.[0]?.message ?? err.message;
+			setError(errors);
+		} finally {
+			setIsLoadingparams(false);
 		}
 	};
 
@@ -175,7 +214,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 				isLoadingCreate,
 				setIsLoadingCreate,
 				setSuccessQR,
-				isLoadingQR
+				isLoadingQR,
+				fetchUsersParams,
+				usersParams,
+				isLoadingparams,
+				setUsersParams,
 			}}
 		>
 			{children}

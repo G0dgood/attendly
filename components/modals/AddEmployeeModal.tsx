@@ -55,7 +55,7 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 			setIsOpen(false);
 			// resetForm();
 		}
-		fetchUsers();
+		fetchUsers({ page: 1, limit: 10 });
 	}, [success]);
 
 

@@ -1,29 +1,145 @@
 "use client";
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
 import Search from '@/components/Search'
 import Image from "next/image";
 import { useAttendance } from '@/utils/AttendanceContext';
+import RealPagination from '@/components/RealPagination';
+import { toast } from 'sonner';
+import FilterDropdown from '@/components/FilterDropdown';
 
 
 
 const Attendance = () => {
 	const attendanceContext: any = useAttendance();
-	const { attendanceRecords, fetchAttendance, isLoading, error } = attendanceContext || {};
+	const { attendanceRecords, fetchAttendance, isLoading, error, getAttendanceParams, attendanceRecordsCalender, loadingAttendanceParams } = attendanceContext || {};
+	const endDates = new Date();
+	const [startDate, setStartDate] = useState("");
+	const [endDate, setEndDate] = useState("");
+	const formattedEndDate = endDates.toISOString().split('T')[0];
+	const totalPages = attendanceRecords?.data?.pages || 1;
+	const [currentPage, setCurrentPage] = useState(1);
+	const [dropFilter, setDropFilter] = useState(false);
+	const [selectedRadio, setSelectedRadio] = useState("Today");
+	const [data, setData] = useState<any>([]);
+	const [limit, setLimit] = useState(10);
+	const [filtered, setFilterd] = useState([]);
+	const [filter, setFilter] = useState<any>([]);
+	const [result, setResult] = useState("");
+
+	const [startDate1] = useState(formattedEndDate);
+	const [endDate1] = useState(formattedEndDate);
 
 
 	useEffect(() => {
-		if (fetchAttendance) {
-			fetchAttendance();
-		}
+		handleAttendanceParams({ page: currentPage, limit: limit });
+
+	}, [currentPage, limit]);
+
+
+
+	const pagination = attendanceRecordsCalender?.data
+	const dataToRender: any = [
+		...(attendanceRecordsCalender?.data?.data || attendanceRecordsCalender || [])
+	];
+
+	useEffect(() => {
+		setCurrentPage(dataToRender)
+	}, []);
+	console.log("attendanceRecordsCalender", attendanceRecordsCalender);
+	// console.log("dataToRender", attendanceRecords.data);
+
+	const handleAttendanceParams = async ({ page, limit }: { page: number; limit: number }) => {
+
+		await getAttendanceParams({
+			page,
+			limit,
+			// Uncomment below if needed
+			// filterByDate: 'range',
+			// startDate: '2025-05-01',
+			// endDate: '2025-05-30',
+		});
+	};
+
+
+
+
+
+
+
+
+	// Error Handling Effect
+	// useEffect(() => {
+	// 	if (allisError) {
+	// 		toast.error(allmessage, { toastId: customId });
+	// 	} 
+	// }, [allisError, allmessage, dispatch]);
+
+
+	// useEffect(() => {
+	// 	const datas = { startDate: startDate1, endDate: endDate1 };
+
+	// 	handleAttendanceParams({ page: currentPage, limit: 5 });
+
+	// }, [endDate1, startDate1]);
+
+
+
+
+	const handleCustomFilters = () => {
+		const datas = { startDate, endDate }
+		// @ts-ignore
+		getAllResponses(datas)
+		setDropFilter(false)
+	}
+
+
+
+	useEffect(() => {
+		setFilterd(dataToRender);
+		setFilter(dataToRender);
+
 	}, []);
 
+	// useEffect(() => {
+	// 	const results = filter?.filter(
+	// 		(data: { user: { userId: string; }; customer: { loan_id: string; }; }) =>
+	// 			data?.user?.userId?.toLowerCase()?.includes(result) ||
+	// 			data?.customer?.loan_id?.toLowerCase()?.includes(result)
+	// 	);
+	// 	setData(results);
+	// }, [result, filter]);
 
-	// Merge API data with mock "soner"
-	const dataToRender = [
-		...(attendanceRecords?.data?.data || attendanceRecords || [])
-	];
+	const handleChangeFilter = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+		setResult(e.target.value);
+	};
+
+	const handlePagination = (page: string | number) => {
+		const totalPages = pagination.pages; // Use pre-calculated pages
+		const currentPage = pagination.currentPage;
+
+		if (typeof page === 'string') {
+			switch (page) {
+				case 'prev':
+					if (currentPage > 1) {
+						handleAttendanceParams({ page: currentPage - 1, limit });
+					}
+					break;
+				case 'next':
+					if (currentPage < totalPages) {
+						handleAttendanceParams({ page: currentPage + 1, limit });
+					}
+					break;
+				default:
+					break;
+			}
+		} else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+			handleAttendanceParams({ page, limit });
+		}
+	};
+
+
 
 
 	return (
@@ -33,14 +149,35 @@ const Attendance = () => {
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6'>
 				<Search />
 
-				<div className='flex flex-col md:flex-row gap-5'>
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none">
-						<Image
-							src={require("../../public/icon/Filter_alt.svg")}
-							alt="search"
-						/>
+				<div className='flex flex-col md:flex-row gap-5 relative'>
+					<button
+						onClick={() => setDropFilter(!dropFilter)}
+						className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB] font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none"
+					>
+						<Image src={require("../../public/icon/Filter_alt.svg")} alt="filter" />
 						Filter
 					</button>
+
+					{dropFilter && (
+						<FilterDropdown
+							startDate={startDate}
+							endDate={endDate}
+							limit={limit}
+							setStartDate={setStartDate}
+							setEndDate={setEndDate}
+							setLimit={setLimit}
+							onApply={() => {
+								handleAttendanceParams({
+									page: 1,
+									limit,
+									// @ts-ignore
+									startDate,
+									endDate,
+								});
+								setDropFilter(false);
+							}}
+						/>
+					)}
 					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
 						Export
 					</button>
@@ -49,9 +186,9 @@ const Attendance = () => {
 			</div>
 
 
-			<div className='table-responsive-vertical'>
+			<div className='table-responsive-vertical mt-5'>
 				<div className='table-container'>
-					<table className={true ? "table" : "table-hover table-mc-light-blue"}>
+					<table className="table">
 						<thead>
 							<tr>
 								<th>Employee Name</th>
@@ -63,33 +200,36 @@ const Attendance = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{isLoading ? (
+							{loadingAttendanceParams ? (
 								<SVGLoaderFetch colSpan={6} />
 							) : dataToRender?.length === 0 ? (
 								<NoRecordFound colSpan={6} />
 							) : (
-								dataToRender.map((record: any) => {
-									const checkIn = record.clockIn
-										? new Date(record.clockIn).toLocaleTimeString()
+								dataToRender?.map((record: any) => {
+									const checkIn = record?.clockIn
+										? new Date(record?.clockIn).toLocaleTimeString()
 										: '—';
-									const checkOut = record.clockOut
-										? new Date(record.clockOut).toLocaleTimeString()
+									const checkOut = record?.clockOut
+										? new Date(record?.clockOut).toLocaleTimeString()
 										: '—';
 
-									const totalHour = record.clockIn && record.clockOut
+									const totalHour = record?.clockIn && record?.clockOut
 										? (
-											(new Date(record.clockOut).getTime() -
-												new Date(record.clockIn).getTime()) /
+											(new Date(record?.clockOut).getTime() -
+												new Date(record?.clockIn).getTime()) /
 											(1000 * 60 * 60)
 										).toFixed(2)
 										: '—';
 
-									const employeeName = record.user?.name || 'N/A';
-									const employeeEmail = record.user?.email || '—';
-									const status = record.status || 'On Time'; // Default status if not present
+									const employeeName = record?.user?.name || 'N/A';
+									const employeeEmail = record?.user?.email || '—';
+
+									const clockInDate = record?.clockIn ? new Date(record?.clockIn) : null;
+									const isEarly = clockInDate && (clockInDate.getHours() < 8 || (clockInDate.getHours() === 8 && clockInDate.getMinutes() === 0));
+									const status = clockInDate ? (isEarly ? 'Early' : 'Late') : 'Absent';
 
 									return (
-										<tr key={record.id}>
+										<tr key={record?.id}>
 											<td data-title='Full Name'>{employeeName}</td>
 											<td data-title='Email'>{employeeEmail}</td>
 											<td data-title='Check In'>{checkIn}</td>
@@ -98,17 +238,13 @@ const Attendance = () => {
 											<td data-title='Status'>
 												<div
 													className={`whitespace-nowrap flex flex-row justify-center items-center px-[6px] py-[4px] w-[60px] h-[22px] 
-                border font-medium text-[12px] leading-[18px] 
-                ${status === 'On Time'
+					border font-medium text-[12px] leading-[18px] 
+					${status === 'Early'
 															? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
 															: status === 'Late'
 																? 'bg-[#FEF3F2] border-[#FECDCA] text-[#B42318]'
-																: status === 'Absent'
-																	? 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]'
-																	: status === 'On Leave'
-																		? 'bg-[#F0F9FF] border-[#B9E6FE] text-[#026AA2]'
-																		: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
-														}`}
+																: 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]'}
+					`}
 												>
 													{status}
 												</div>
@@ -116,42 +252,32 @@ const Attendance = () => {
 										</tr>
 									);
 								})
+
 							)}
 						</tbody>
 					</table>
 
 				</div>
 			</div>
-
-			<div className='flex flex-row justify-between w-full mt-5'>
-				<button className="flex flex-row justify-center items-center py-2 gap-2  px-5  bg-white border border-[#E5E7EB] font-medium text-3 leading-[150%] text-[#3A4050]">
-					<Image
-						src={require("../../public/icon/arrow-left.svg")}
-						alt="Next"
-					/> Previous</button>
-				<div className="flex flex-row items-center gap-[10px]">
-					<button className="w-5 h-5 bg-[#F9FAFB] flex justify-center items-center border border-[#E5E7EB]
-				text-3 leading-5 text-center text-[#050711] font-inter">1</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">2</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">3</button>
-					<div>
-						<Image
-							src={require("../../public/icon/Number.svg")}
-							alt="Next"
-						/>
+			{pagination?.total > 1 && (
+				<div className="w-full ">
+					<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+						<h3 className="text-base font-semibold text-[#050711]">
+							Total {pagination?.data?.length} of {pagination?.total} Attendance
+							<span className="text-sm font-normal text-gray-500 ml-2">
+								Page {pagination?.currentPage} of {pagination?.pages}
+							</span>
+						</h3>
 					</div>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">8</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">9</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">10</button>
+
+					<div className="flex justify-between w-full mt-6">
+						<RealPagination handlePagination={handlePagination} pagination={pagination} />
+					</div>
 				</div>
-				<button className="flex flex-row justify-center items-center   py-2 gap-2  px-5  bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050]">
-					Next
-					<Image
-						src={require("../../public/icon/arrow-right.svg")}
-						alt="Next"
-					/>
-				</button>
-			</div>
+			)}
+
+
+
 		</div>
 	)
 }

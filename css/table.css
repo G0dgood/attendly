@@ -1,6 +1,5 @@
 .table-container{
- overflow: auto !important; 
- margin-top: 2rem;
+ overflow: auto !important;  
 }
  
 .table {

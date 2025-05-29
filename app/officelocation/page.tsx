@@ -92,7 +92,7 @@ const Attendance = () => {
 			</div>
 
 
-			<div className="table-responsive-vertical">
+			<div className="table-responsive-vertical mt-5">
 				<div className="table-container">
 					<table className="table">
 						<thead>
@@ -156,7 +156,7 @@ const Attendance = () => {
 				</div>
 			</div>
 
-			<div className='flex flex-row justify-between w-full mt-5'>
+			{/* <div className='flex flex-row justify-between w-full mt-5'>
 				<button className="flex flex-row justify-center items-center py-2 gap-2  px-5  bg-white border border-[#E5E7EB] font-medium text-3 leading-[150%] text-[#3A4050]">
 					<Image
 						src={require("../../public/icon/arrow-left.svg")}
@@ -184,7 +184,7 @@ const Attendance = () => {
 						alt="Next"
 					/>
 				</button>
-			</div>
+			</div> */}
 			<OfficeLocationModal isOpen={isOpen} setIsOpen={setIsOpen} />
 		</div>
 	)

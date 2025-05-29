@@ -68,7 +68,7 @@ const EmployeeDashBoard = () => {
 				await fetchAttendance();
 				await fetchOfficeLocations();
 			} catch (error: any) {
-				toast.error(error.message);
+				// toast.error(error.message);
 			}
 		};
 

@@ -8,7 +8,8 @@ interface AttendanceContextType {
 	attendanceRecords: any[];
 	isLoading: boolean;
 	fetchAttendance: () => Promise<void>;
-	getCalender: any
+	getAttendanceParams: any
+	getAttendanceSummary: any
 	addAttendance: (employeeId: any, date: any, status: any) => Promise<void>;
 	addAttendanceManual: (input: any) => Promise<void>;
 	updateAttendance: (recordId: any, newStatus: any) => Promise<void>;
@@ -16,11 +17,17 @@ interface AttendanceContextType {
 	setSelectedEmployeeId: React.Dispatch<React.SetStateAction<any>>;
 	setErrorAttendance: React.Dispatch<React.SetStateAction<any>>;
 	setSuccessAttendance: React.Dispatch<React.SetStateAction<any>>;
+	setIsLoadingAttendanceSummary: React.Dispatch<React.SetStateAction<any>>;
+	setAttendanceRecordsCalender: React.Dispatch<React.SetStateAction<any>>;
 	error: unknown;
 	errorAttendance: unknown;
 	isLoadingAttendance: unknown;
+	loadingAttendanceParams: unknown;
+	loadingAttendanceSummary: unknown;
 	setError: React.Dispatch<React.SetStateAction<unknown>>;
 	success: boolean | null;
+	attendanceRecordsCalender: any[];
+	attendanceSummary: any[];
 	successAttendance: boolean | null;
 	setSuccess: React.Dispatch<React.SetStateAction<boolean | null>>;
 	modalOpen: boolean;
@@ -34,10 +41,15 @@ const AttendanceContext = createContext<AttendanceContextType | null>(null);
 export const useAttendance = () => useContext(AttendanceContext);
 
 export const AttendanceProvider = ({ children }: { children: React.ReactNode }) => {
-	const { token } = useUserPrivileges();
+	const { token, user } = useUserPrivileges();
+	const id = user?.officeId;
 	const [attendanceRecords, setAttendanceRecords] = useState<any[]>([]);
+	const [attendanceRecordsCalender, setAttendanceRecordsCalender] = useState<any[]>([]);
+	const [attendanceSummary, setAttendanceSummary] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLoadingAttendance, setIsLoadingAttendance] = useState(false);
+	const [loadingAttendanceParams, setIsLoadingAttendanceParams] = useState(false);
+	const [loadingAttendanceSummary, setIsLoadingAttendanceSummary] = useState(false);
 	const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 	const [error, setError] = useState<unknown>(null);
 	const [errorAttendance, setErrorAttendance] = useState<unknown>(null);
@@ -65,7 +77,8 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 		}
 	};
 
-	const getCalender = async (params: any) => {
+	const getAttendanceParams = async (params?: any) => {
+		setIsLoadingAttendanceParams(true);
 		console.log('(params) ', params)
 		const url = buildDynamicURL(`${process.env.NEXT_PUBLIC_BASE_URL}/attendance`, {
 			page: params.page,
@@ -74,15 +87,52 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 			startDate: params.startDate,
 			endDate: params.endDate,
 		});
+		try {
+			const { data } = await axios.get(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 
-		const { data } = await axios.get(url, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		});
-
-		// return data;
+			setAttendanceRecordsCalender(data?.data || []);
+			setIsLoadingAttendanceParams(true);
+		} catch (err: any) {
+			const errors =
+				err.response?.data?.errors?.[0]?.message ?? err.message;
+			setErrorAttendance(errors);
+		} finally {
+			setIsLoadingAttendanceParams(false);
+		}
 	};
+
+	const getAttendanceSummary = async (params: any) => {
+		setIsLoadingAttendanceSummary(true);
+		console.log('(params) ', params)
+		const url = buildDynamicURL(`${process.env.NEXT_PUBLIC_BASE_URL}/attendance/summary/${id}`, {
+			page: params.page,
+			limit: params.limit,
+			filterByDate: params.filterByDate,
+			startDate: params.startDate,
+			endDate: params.endDate,
+		});
+		try {
+			const { data } = await axios.get(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			setAttendanceSummary(data?.data || []);
+			setIsLoadingAttendanceSummary(true);
+		} catch (err: any) {
+			const errors =
+				err.response?.data?.errors?.[0]?.message ?? err.message;
+			setErrorAttendance(errors);
+		} finally {
+			setIsLoadingAttendanceSummary(false);
+		}
+	};
+
+
 
 	const addAttendance = async (employeeId: any, date: any, status: any) => {
 		setIsLoading(true);
@@ -170,17 +220,24 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
 				setModalOpen,
 				dateFilter,
 				setDateFilter,
-				getCalender,
+				getAttendanceParams,
 				successAttendance,
 				errorAttendance,
 				isLoadingAttendance,
 				addAttendanceManual,
 				setErrorAttendance,
-				setSuccessAttendance
+				setSuccessAttendance,
+				attendanceRecordsCalender,
+				setAttendanceRecordsCalender,
+				loadingAttendanceParams,
+				getAttendanceSummary,
+				loadingAttendanceSummary,
+				setIsLoadingAttendanceSummary,
+				attendanceSummary
 			}}
 		>
 			{children}
 		</AttendanceContext.Provider>
 	);
 };
-// Removed duplicate declaration of useAttendance
+

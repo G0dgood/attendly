@@ -5,6 +5,7 @@ export function useUserPrivileges() {
 
   const userType = session?.user?.role ?? null;
   const userToken = session?.user?.token ?? null;
+  const user = session?.user ?? null;
 
   const isSuperAdmin = userType === "SuperAdmin";
   const isAdmin = userType === "admin";
@@ -22,5 +23,6 @@ export function useUserPrivileges() {
     isFinancialApprover,
     isClient,
     token,
+    user
   };
 }
