@@ -224,4 +224,54 @@ align-items: center;
   height: 50px; 
 }
 
+
+/* Responsive Styles */
+@media only screen and (max-width: 980px) {
+  .logo-section {
+    display: none;
+  }
+  
+  .login-form-container {
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .form-container_text h1 {
+    font-size: 26px;
+  }
+
+  .form-container_text p {
+    font-size: 13px;
+  }
+
+  #login-wrapper {
+    padding: 2rem 1rem;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .form-container_text h1 {
+    font-size: 24px !important;
+    font-weight: bold !important;
+  }
+
+  .form-container_text p {
+    font-size: 12px !important;
+  }
+
+  .login-form-container {
+    padding: 2rem !important;
+  }
+
+  .create_fiPlus_icon {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .login-form-container button {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
+
  

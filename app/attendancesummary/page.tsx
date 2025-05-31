@@ -115,6 +115,9 @@ const AttendanceSummary = () => {
 				<Search />
 
 				<div className='flex flex-col md:flex-row gap-5 relative'>
+					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
+						Export
+					</button>
 					<button
 						onClick={() => setDropFilter(!dropFilter)}
 						className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB] font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none"
@@ -143,9 +146,7 @@ const AttendanceSummary = () => {
 							}}
 						/>
 					)}
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
-						Export
-					</button>
+
 				</div>
 
 			</div>
@@ -153,13 +154,13 @@ const AttendanceSummary = () => {
 
 			<div className='table-responsive-vertical mt-5'>
 				<div className='table-container'>
-					<table className={true ? "table" : "table-hover table-mc-light-blue"}>
+					<table className="table" >
 						<thead>
 							<tr>
 								<th>Full Name</th>
 								<th>Email</th>
-								<th>Office Location</th>
-								<th>Office Address</th>
+								<th className='whitespace-nowrap'>Office Location</th>
+								<th className='whitespace-nowrap'>Office Address</th>
 								<th>Date</th>
 								<th>Check In</th>
 								<th>Check Out</th>
@@ -207,15 +208,15 @@ const AttendanceSummary = () => {
 
 								return (
 									<tr key={record.id}>
-										<td data-title='Full Name'>{employeeName}</td>
-										<td data-title='Email'>{employeeEmail}</td>
-										<td data-title='Office Location'>{officeLocation}</td>
-										<td data-title='Office Address'>{officeAddress}</td>
-										<td data-title='Date'>{checkInDate}</td>
-										<td data-title='Check In'>{checkIn}</td>
-										<td data-title='Check Out'>{checkOut}</td>
-										<td data-title='Total Hour'>{totalHour}</td>
-										<td data-title='Status'>
+										<td className='whitespace-nowrap'>{employeeName}</td>
+										<td>{employeeEmail}</td>
+										<td>{officeLocation}</td>
+										<td>{officeAddress}</td>
+										<td>{checkInDate}</td>
+										<td>{checkIn}</td>
+										<td>{checkOut}</td>
+										<td>{totalHour}</td>
+										<td>
 											<div
 												className={`whitespace-nowrap flex flex-row justify-center items-center px-[6px] py-[4px] w-[60px] h-[22px] 
 						border font-medium text-[12px] leading-[18px] 

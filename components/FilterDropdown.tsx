@@ -21,7 +21,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 	onApply,
 }) => {
 	return (
-		<div className="absolute mt-2 bg-white border border-gray-200 shadow-lg rounded-none p-4 z-50 w-64 right-24 top-9">
+		<div className="absolute mt-2 bg-white border border-gray-200 shadow-lg rounded-none p-4 z-50 w-64 right-0 top-9">
 			<div className="flex flex-col gap-4">
 				<label className="text-sm font-medium text-gray-700">
 					Start Date

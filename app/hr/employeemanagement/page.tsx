@@ -161,8 +161,14 @@ const EmployeeDashBoard = () => {
 				<Search />
 				<div className='flex flex-col md:flex-row gap-5 relative'>
 					<button
+						onClick={() => setIsOpen(true)}
+						className="cursor-pointer flex flex-col md:flex-row justify-center items-center gap-2 md:w-[150px] h-[40px] !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
+					>
+						Add Employee
+					</button>
+					<button
 						onClick={() => setDropFilter(!dropFilter)}
-						className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB] font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none"
+						className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB] font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none cursor-pointer"
 					>
 						<Image src={require("../../../public/icon/Filter_alt.svg")} alt="filter" />
 						Filter
@@ -188,12 +194,7 @@ const EmployeeDashBoard = () => {
 							}}
 						/>
 					)}
-					<button
-						onClick={() => setIsOpen(true)}
-						className="cursor-pointer flex flex-col md:flex-row justify-center items-center gap-2 md:w-[150px] h-[40px] !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
-					>
-						Add Employee
-					</button>
+
 				</div>
 			</div>
 
@@ -243,10 +244,10 @@ const EmployeeDashBoard = () => {
 													</svg>
 												</button>
 											</td>
-											<td data-title="Full Name">{user?.name}</td>
-											<td data-title="Gender">{user?.gender}</td>
-											<td data-title="Phone">{user?.phone}</td>
-											<td data-title="Status">
+											<td className='whitespace-nowrap'>{user?.name}</td>
+											<td >{user?.gender}</td>
+											<td >{user?.phone}</td>
+											<td >
 												<div
 													className={`flex flex-row justify-center items-center px-[6px] py-[4px] w-[46px] h-[22px] border font-medium text-[12px] leading-[18px] ${user?.isActive === 'active'
 														? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
@@ -263,9 +264,9 @@ const EmployeeDashBoard = () => {
 													{status}
 												</div>
 											</td>
-											<td data-title="Designation">{user?.role || 'N/A'}</td>
-											<td data-title="Email">{user?.email}</td>
-											<td data-title="Action">
+											<td>{user?.role || 'N/A'}</td>
+											<td>{user?.email}</td>
+											<td>
 												<div className="flex flex-row gap-[20px]">
 													<button className="cursor-pointer">
 														<Image src={require('../../../public/Trash_light.svg')} alt="delete" />

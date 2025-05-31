@@ -16,9 +16,14 @@ const Footer = () => {
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
 	const navItems = [
+		// { label: "Dashboard", icon: dashboard, iconWhite: dashboardBlue, path: "/dashboard" },
+		// { label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/employee" },
+		// { label: "Attendance", icon: time, iconWhite: timeBlue, path: "/employeeattendance" },
 		{ label: "Dashboard", icon: dashboard, iconWhite: dashboardBlue, path: "/dashboard" },
-		{ label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/employee" },
-		{ label: "Attendance", icon: time, iconWhite: timeBlue, path: "/employeeattendance" },
+		{ label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/hr/employeemanagement" },
+		{ label: "Attendance", icon: time, iconWhite: timeBlue, path: "/attendances" },
+		{ label: "Summary", icon: time, iconWhite: timeBlue, path: "/attendancesummary" },
+		{ label: "Office", icon: employee, iconWhite: timeBlue, path: "/officelocation" },
 	];
 
 

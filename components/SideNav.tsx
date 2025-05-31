@@ -19,7 +19,7 @@ const SideNav: React.FC = () => {
     { label: "Dashboard", icon: dashboard, iconWhite: dashboardWhite, path: "/dashboard" },
     { label: "Employee", icon: employee, iconWhite: employeeWhite, path: "/hr/employeemanagement" },
     { label: "Attendance", icon: time, iconWhite: timeWhite, path: "/attendances" },
-    { label: "Attendance Summary", icon: time, iconWhite: timeWhite, path: "/attendancesummary" },
+    { label: "Summary", icon: time, iconWhite: timeWhite, path: "/attendancesummary" },
     { label: "Office Location", icon: employee, iconWhite: employeeWhite, path: "/officelocation" },
   ];
 

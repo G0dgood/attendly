@@ -144,50 +144,37 @@ const EmployeeDashBoard = () => {
 				</div>
 			</div >
 
-			<div className='mt-[40px] w-full'>
-				<div className=' mt-[20px] h-[350px] w-full flex flex-col md:flex-row gap-[24px]'>
-					<div className='w-full md:w-[70%] h-full'>
-						<div className='flex flex-row  justify-between mb-8'>
-							<h3 className="font-montserrat font-medium text-[20px] leading-6 text-[#141414] flex items-center order-0 flex-none grow-0">
-								Attendance list
-							</h3>
-							<button
-								onClick={() => router.push('/attendances')}
-								className="font-medium text-[14px] leading-[17px] text-[#2563EB] cursor-pointer	flex items-center order-1 flex-none grow-0 px-4 py-2 bg-white   "
-							>
-								View All
-							</button>
 
-						</div>
-						<AttendanceList />
+			<div className=' mt-[60px] h-full md:h-[350px] w-full flex flex-col md:flex-row gap-[24px]'>
+				<div className='w-full md:w-[70%] h-full'>
+					<div className='flex flex-row  justify-between mb-8'>
+						<h3 className="font-montserrat font-medium text-[20px] leading-6 text-[#141414] flex items-center order-0 flex-none grow-0">
+							Attendance list
+						</h3>
+						<button
+							onClick={() => router.push('/attendances')}
+							className="font-bold text-[16px] leading-[17px] text-[#2563EB] cursor-pointer	flex items-center   flex-none  px-4 py-2 bg-white"
+						>
+							View All
+						</button>
+
 					</div>
-
-					<div className='w-full md:w-[30%] h-full '>
-						<div className='flex flex-row justify-between mb-4'>
-							<div />
-							<div className='w-[40%]'>
-								<CustomDateDropdown label={''} name={''} handleOnChange={handleOnChange} />
-							</div>
-						</div>
-
-						<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)]  w-full h-full '>
-							{/* <button
-								className={`flex flex-row justify-center items-center px-[6px] py-[4px] h-[40px] w-[150px]   border font-medium text-[12px] leading-[18px]  
-												  !bg-[#2563EB] border-[#B9E6FE] text-[#fff] rounded-none
-									`}
-								onClick={handleSubmits}
-							>
-
-								Create ffff
-							</button> */}
-							<Chart chartdata={attendanceRecord} />
-						</div>
-					</div>
+					<AttendanceList />
 				</div>
 
+				<div className='w-full md:w-[30%] h-full '>
+					<div className=' mb-4'>
+						<CustomDateDropdown label={''} name={''} handleOnChange={handleOnChange} />
+
+					</div>
+
+					<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)]  w-full h-full '>
+						<Chart chartdata={attendanceRecord} />
+					</div>
+				</div>
 			</div>
 
-		</div >
+		</div>
 	)
 }
 

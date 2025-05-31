@@ -72,16 +72,7 @@ const Attendance = () => {
 				<Search />
 
 				<div className='flex flex-col md:flex-row gap-5'>
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050] rounded-none">
-						<Image
-							src={require("../../public/icon/Filter_alt.svg")}
-							alt="search"
-						/>
-						Filter
-					</button>
-					{/* <button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
-						Export
-					</button> */}
+
 
 					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
 						onClick={() => setIsOpen(true)}>
