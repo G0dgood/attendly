@@ -28,14 +28,6 @@ const NoRecordFound = ({ colSpan }: any) => (
     </td>
   </tr>
 );
-// NoRecordFound
-const NoRecordFoundD = ({ colSpan }: any) => (
-
-  <div className="center-content" id="table-loader">
-    <MdOutlineErrorOutline size={75} />
-    <p id="mt-3">No record found</p>
-  </div>
-);
 
 
 
@@ -85,7 +77,6 @@ const getInitials = (name: string | null | undefined) => {
 export {
   NoRecordFound,
   SVGLoaderFetch,
-  NoRecordFoundD,
   parseApiDate,
   CapitalizeFirstLetter,
   getRandomColor,

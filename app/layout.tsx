@@ -34,7 +34,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${poppins.className} antialiased`}>
-        <Toaster />
+        <Toaster richColors />
         <NewProvider session={session}>
           {children}
         </NewProvider>

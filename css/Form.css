@@ -512,29 +512,7 @@ textarea :hover {
   color: var(--text);
 }
 
-
-/* #custom-btn:active{
-  padding: 10px  ;
-  width: 100%;
-  text-align: center;
-   display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold !important;
-    border: 1px solid var(--accent-purple);
-} */
-
-/* Adjust icon margin for spacing */
-/* button svg {
-  margin-right: 5px !important;
-} */
-
-/* Additional styling for focus state */
-/* button:focus {
-  border-color: #007bff;  
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);  
-} */
-
+ 
 
 .flex-date-input {
   display: grid;
