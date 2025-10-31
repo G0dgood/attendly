@@ -73,7 +73,7 @@ const EmployeeDashBoard = () => {
 		if (fetchAttendance) {
 			fetchAttendance();
 		}
-	}, [fetchAttendance]);
+	}, []);
 
 	useEffect(() => {
 		if (successAttendance) {

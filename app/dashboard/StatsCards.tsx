@@ -66,25 +66,25 @@ const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) =>
 	const statsData = [
 		{
 			title: "Total Employees",
-			value: totalEmployees.toLocaleString(),
+			value: totalEmployees,
 			color: "#067647",
 			img: <Image src={require("../../public/hugeicons_user-group.svg")} alt="employees" />
 		},
 		{
 			title: dateFilter === "Today" ? "Absent Today" : "Absent",
-			value: absentToday.toLocaleString(),
+			value: absentToday,
 			color: "#B42318",
 			img: <Image src={require("../../public/solar_user-cross-broken.svg")} alt="absent" />
 		},
 		{
 			title: "Early Arrivals",
-			value: earlyArrivals.toLocaleString(),
+			value: earlyArrivals,
 			color: "#067647",
 			img: <Image src={require("../../public/solar_user-check-broken.svg")} alt="early" />
 		},
 		{
 			title: "Late Arrivals",
-			value: lateArrivals.toLocaleString(),
+			value: lateArrivals,
 			color: "#B54708",
 			img: <Image src={require("../../public/solar_user-minus-broken.svg")} alt="late" />
 		}

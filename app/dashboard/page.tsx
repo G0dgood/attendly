@@ -6,128 +6,27 @@ import StatsCards from './StatsCards';
 import CustomDateDropdown from '@/components/CustomDateDropdown';
 import AttendanceList from './component/AttendanceList';
 import Chart from './component/Chart';
-import { useAttendance } from '@/utils/AttendanceContext';
 import { toast } from 'sonner';
-import { useUserContext } from '@/utils/UserContext';
 import QrScanner from './component/QrScanner';
-import { useOfficeLocation } from '@/utils/OfficeLocationContext';
 import Dropdowns from '@/components/CustomDropdown';
-import { SVGLoader } from '@/components/SVGLoader';
 import { useRouter } from 'next/navigation';
-
-
+import { 
+	useGetAttendanceQuery, 
+	useGetAttendanceParamsQuery,
+	useGetUsersParamsQuery,
+	useGetOfficeLocationsQuery,
+	useQrTokenMutation
+} from '@/utils/APISlice/api';
 
 const EmployeeDashBoard = () => {
 	const router = useRouter();
 	const { data: session }: any = useSession();
-	const { attendanceRecords, fetchAttendance, isLoading, error, getCalender, attendanceRecordsCalender }: any = useAttendance();
-	const { users, fetchUsers, qrToken, isLoadingQR, successQR, setSuccessQR, dataQR }: any = useUserContext();
-	const { officeLocations, isLoading: newisLoading, fetchOfficeLocations } = useOfficeLocation()!;
 	const [inputs, setInputs] = useState({
 		officeId: "",
 		type: ""
 	});
 	const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
-
-	console.log("officeLocations-dataQR", dataQR);
-
-
-	useEffect(() => {
-		if (successQR) {
-			toast.success("QR Create!");
-			setSuccessQR(false)
-		}
-	}, [successQR]);
-
-
-	useEffect(() => {
-		if (session?.user?.officeId) {
-			setInputs(prev => ({
-				...prev,
-				officeId: session.user.officeId,
-			}));
-		}
-	}, [session?.user?.officeId]);
-
-	// Merge API data with mock "soner"
-	const employee = [
-		...(users?.users || users || [])
-	];
-	// Merge API data - use filtered calendar data if date filter is active, otherwise use regular records
-	const attendanceRecord = selectedDateFilter !== "Today" && attendanceRecordsCalender?.data
-		? [
-			...(attendanceRecordsCalender?.data?.data || attendanceRecordsCalender || [])
-		]
-		: [
-			...(attendanceRecords?.data?.data || attendanceRecords || [])
-		];
-
-
-
-
-
-	useEffect(() => {
-		const controller = new AbortController();
-
-		const fetchData = async () => {
-			try {
-				await fetchUsers();
-				await fetchAttendance();
-				await fetchOfficeLocations();
-			} catch (error: any) {
-				// toast.error(error.message);
-			}
-		};
-
-		fetchData();
-
-		return () => {
-
-			controller.abort();
-		};
-	}, []);
-
-	// Fetch attendance when date filter changes
-	useEffect(() => {
-		if (getCalender) {
-			const dateRange = getDateRange(selectedDateFilter);
-			getCalender({
-				page: 1,
-				limit: 50,
-				filterByDate: 'range',
-				startDate: dateRange.start,
-				endDate: dateRange.end,
-			});
-		}
-	}, [selectedDateFilter]);
-
-
-
-
-	const handleOnChange = (input: string, value: string) => {
-		setInputs((prevState) => ({
-			...prevState,
-			[input]: value,
-		}));
-	};
-
-
-
-
-	const handleSubmit = () => {
-
-		qrToken(inputs)
-	}
-
-	const handleSubmits = () => {
-		getCalender({
-			page: 1,
-			limit: 50,
-			filterByDate: 'range',
-			startDate: '2025-05-01',
-			endDate: '2025-05-30',
-		})
-	}
+	const [dataQR, setDataQR] = useState(null);
 
 	// Date filter functions
 	const getDateRange = (filter: string) => {
@@ -178,10 +77,72 @@ const EmployeeDashBoard = () => {
 		}
 	};
 
+	// RTK Query hooks
+	const dateRange = getDateRange(selectedDateFilter);
+	const { data: attendanceRecords = {}, isLoading: isLoadingAttendance } = useGetAttendanceQuery(undefined, { skip: selectedDateFilter !== "Today" });
+	const { data: attendanceRecordsCalender = {} } = useGetAttendanceParamsQuery(
+		{ 
+			page: 1, 
+			limit: 500, 
+			filterByDate: 'range', 
+			startDate: dateRange.start, 
+			endDate: dateRange.end 
+		},
+		{ skip: selectedDateFilter === "Today" }
+	);
+	const { data: usersParams = {} } = useGetUsersParamsQuery({ page: 1, limit: 1000 });
+	const { data: officeLocationsData = {} } = useGetOfficeLocationsQuery();
+	const [triggerQrToken, { isLoading: isLoadingQR }] = useQrTokenMutation();
+
+	useEffect(() => {
+		if (session?.user?.officeId) {
+			setInputs(prev => ({
+				...prev,
+				officeId: session.user.officeId,
+			}));
+		}
+	}, [session?.user?.officeId]);
+
+	// Merge API data - ensure arrays
+	const usersData = Array.isArray(usersParams?.data?.users) ? usersParams.data.users : 
+	                  Array.isArray(usersParams?.users) ? usersParams.users : [];
+	const employee = [...usersData];
+	
+	const getAttendanceData = (data: any) => {
+		if (Array.isArray(data)) return data;
+		if (data?.data && Array.isArray(data.data)) return data.data;
+		return [];
+	};
+	
+	const attendanceRecord = selectedDateFilter !== "Today" && attendanceRecordsCalender?.data
+		? [...getAttendanceData(attendanceRecordsCalender?.data)]
+		: [...getAttendanceData(attendanceRecords?.data)];
+
+	const officeLocations = Array.isArray(officeLocationsData?.data) ? officeLocationsData.data : [];
+
+	const handleOnChange = (input: string, value: string) => {
+		setInputs((prevState) => ({
+			...prevState,
+			[input]: value,
+		}));
+	};
+
+	const handleSubmit = async () => {
+		try {
+			const result = await triggerQrToken(inputs).unwrap();
+			if (result?.data) {
+				setDataQR(result.data);
+				toast.success("QR Create!");
+			}
+		} catch (error) {
+			console.error('Error creating QR token:', error);
+			toast.error('Failed to create QR token');
+		}
+	};
+
 	const handleDateFilter = (filter: string) => {
 		setSelectedDateFilter(filter);
 	};
-
 
 	return (
 		<div className='w-full'>
@@ -197,8 +158,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Today")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Today"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Today
@@ -206,8 +167,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Yesterday")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Yesterday"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Yesterday
@@ -215,8 +176,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Last Week")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Last Week"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Last Week
@@ -224,8 +185,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Last Month")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Last Month"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Last Month
@@ -250,14 +211,14 @@ const EmployeeDashBoard = () => {
 					</button>
 				</div>
 			</div>
-			<div className='flex flex-col md:flex-row gap-[24px] mt-[24px]  '>
+			<div className='flex flex-col md:flex-row md:items-stretch gap-[24px] mt-[24px]  '>
 				<StatsCards
 					attendanceRecords={attendanceRecord}
 					users={employee}
 					dateFilter={selectedDateFilter}
 					dateRange={getDateRange(selectedDateFilter)}
 				/>
-				<div className='w-[100%] md:w-[30%] h-full md:h-[268px] flex flex-col gap-2'>
+				<div className='w-[100%] md:w-[30%] h-full md:h-[270px] flex flex-col gap-2'>
 					<QrScanner dataQR={dataQR} isLoadingQR={isLoadingQR} />
 
 				</div>

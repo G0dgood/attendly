@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import React from "react";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import NewProvider from "./utils/provider";
@@ -31,15 +30,8 @@ export default async function RootLayout({
     // Handle JWT decryption errors - this happens when:
     // 1. NEXTAUTH_SECRET changed but old session cookies exist
     // 2. Session cookies are corrupted
-    // Setting session to null will force user to re-login
-    if (error?.message?.includes('decryption') || error?.code === 'ERR_JWT_DECRYPTION') {
-      // Silently handle - user will need to login again
-      session = null;
-    } else {
-      // Log other errors for debugging
-      console.error("Session error:", error);
-      session = null;
-    }
+    // Silently handle - setting session to null will force user to re-login
+    session = null;
   }
 
   return (

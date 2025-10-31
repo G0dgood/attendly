@@ -18,12 +18,12 @@ const QrScanner = ({ dataQR, isLoadingQR }: any) => {
 
 						<div className="flex items-center justify-center p-2">
 							{data?.token ? (
-								<QRCodeSVG value={data?.token} size={310} level="H" />
+								<QRCodeSVG value={data?.token} size={220} level="H" />
 							) : (
 								<Image
 									src={require("../../../public/Barcode.svg")}
 									alt="barcode"
-									className="w-[100%] h-[250px]  object-contain"
+									className="w-[80%] h-[80%]  object-contain"
 								/>
 							)}
 						</div>

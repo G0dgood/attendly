@@ -26,18 +26,6 @@ declare module "next-auth" {
   }
 }
 
-// Generate a fallback secret if NEXTAUTH_SECRET is not set (for development only)
-const getSecret = () => {
-  if (process.env.NEXTAUTH_SECRET) {
-    return process.env.NEXTAUTH_SECRET;
-  }
-  if (process.env.NODE_ENV === 'production') {
-    console.warn('NEXTAUTH_SECRET is not set in production!');
-  }
-  // Fallback secret for development - users should set NEXTAUTH_SECRET in .env
-  return "attendly-dev-secret-change-me";
-};
-
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
@@ -80,9 +68,8 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: getSecret(),
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
     error: "/",
@@ -101,19 +88,16 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token && session) {
-        session.user.id = token.id as string;
-        session.user.email = token.email ?? "";
-        session.user.token = token.token as string;
-        session.user.role = token.role as string;
-        session.user.fullName = token.fullName as string;
-        session.user.officeId = token.officeId as string;
-        session.user.phone = token.phone as string;
-      }
+      session.user.id = token.id as string;
+      session.user.email = token.email ?? "";
+      session.user.token = token.token as string;
+      session.user.role = token.role as string;
+      session.user.fullName = token.fullName as string;
+      session.user.officeId = token.officeId as string;
+      session.user.phone = token.phone as string;
       return session;
     },
   },
-  debug: process.env.NODE_ENV === 'development',
 };
 
  
