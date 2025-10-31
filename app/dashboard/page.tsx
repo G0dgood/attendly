@@ -20,7 +20,7 @@ import { useRouter } from 'next/navigation';
 const EmployeeDashBoard = () => {
 	const router = useRouter();
 	const { data: session }: any = useSession();
-	const { attendanceRecords, fetchAttendance, isLoading, error, getCalender }: any = useAttendance();
+	const { attendanceRecords, fetchAttendance, isLoading, error, getCalender, attendanceRecordsCalender }: any = useAttendance();
 	const { users, fetchUsers, qrToken, isLoadingQR, successQR, setSuccessQR, dataQR }: any = useUserContext();
 	const { officeLocations, isLoading: newisLoading, fetchOfficeLocations } = useOfficeLocation()!;
 	const [inputs, setInputs] = useState({
@@ -53,10 +53,14 @@ const EmployeeDashBoard = () => {
 	const employee = [
 		...(users?.users || users || [])
 	];
-	// Merge API data with mock "soner"
-	const attendanceRecord = [
-		...(attendanceRecords?.data?.data || attendanceRecords || [])
-	];
+	// Merge API data - use filtered calendar data if date filter is active, otherwise use regular records
+	const attendanceRecord = selectedDateFilter !== "Today" && attendanceRecordsCalender?.data
+		? [
+			...(attendanceRecordsCalender?.data?.data || attendanceRecordsCalender || [])
+		]
+		: [
+			...(attendanceRecords?.data?.data || attendanceRecords || [])
+		];
 
 
 
@@ -82,6 +86,20 @@ const EmployeeDashBoard = () => {
 			controller.abort();
 		};
 	}, []);
+
+	// Fetch attendance when date filter changes
+	useEffect(() => {
+		if (getCalender) {
+			const dateRange = getDateRange(selectedDateFilter);
+			getCalender({
+				page: 1,
+				limit: 50,
+				filterByDate: 'range',
+				startDate: dateRange.start,
+				endDate: dateRange.end,
+			});
+		}
+	}, [selectedDateFilter]);
 
 
 
@@ -115,7 +133,7 @@ const EmployeeDashBoard = () => {
 	const getDateRange = (filter: string) => {
 		const today = new Date();
 		today.setHours(0, 0, 0, 0);
-		
+
 		switch (filter) {
 			case "Today":
 				const todayEnd = new Date(today);
@@ -176,43 +194,39 @@ const EmployeeDashBoard = () => {
 						<span className="text-sm text-gray-600">{getDateRange(selectedDateFilter).label}</span>
 					</div>
 					<div className='flex flex-row gap-2'>
-						<button 
+						<button
 							onClick={() => handleDateFilter("Today")}
-							className={`px-3 py-1 text-xs rounded-none border ${
-								selectedDateFilter === "Today" 
-									? "!bg-blue-600 text-white !border-blue-600" 
+							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Today"
+									? "!bg-blue-600 text-white !border-blue-600"
 									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
-							}`}
+								}`}
 						>
 							Today
 						</button>
-						<button 
+						<button
 							onClick={() => handleDateFilter("Yesterday")}
-							className={`px-3 py-1 text-xs rounded-none border ${
-								selectedDateFilter === "Yesterday" 
-									? "!bg-blue-600 text-white !border-blue-600" 
+							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Yesterday"
+									? "!bg-blue-600 text-white !border-blue-600"
 									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
-							}`}
+								}`}
 						>
 							Yesterday
 						</button>
-						<button 
+						<button
 							onClick={() => handleDateFilter("Last Week")}
-							className={`px-3 py-1 text-xs rounded-none border ${
-								selectedDateFilter === "Last Week" 
-									? "!bg-blue-600 text-white !border-blue-600" 
+							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Last Week"
+									? "!bg-blue-600 text-white !border-blue-600"
 									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
-							}`}
+								}`}
 						>
 							Last Week
 						</button>
-						<button 
+						<button
 							onClick={() => handleDateFilter("Last Month")}
-							className={`px-3 py-1 text-xs rounded-none border ${
-								selectedDateFilter === "Last Month" 
-									? "!bg-blue-600 text-white !border-blue-600" 
+							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Last Month"
+									? "!bg-blue-600 text-white !border-blue-600"
 									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
-							}`}
+								}`}
 						>
 							Last Month
 						</button>
