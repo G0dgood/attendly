@@ -1,16 +1,13 @@
 import Image from "next/image";
 
-const StatsCards = ({ attendanceRecords, users }: any) => {
+const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) => {
 	const totalEmployees = users?.length || 0;
-
-	// Get today's date in YYYY-MM-DD format
-	const today = new Date().toISOString().split("T")[0];
 
 	const dataToRender = [
 		...(attendanceRecords?.data?.data || attendanceRecords || [])
 	];
 
-	// Filter only today's CHECK_IN records (valid timestamps)
+	// Filter CHECK_IN records based on selected date range
 	const checkInRecords = dataToRender
 		.filter((record: any) => {
 			if (!record?.timestamp) return false;
@@ -19,8 +16,18 @@ const StatsCards = ({ attendanceRecords, users }: any) => {
 			const recordDate = new Date(record.timestamp);
 			if (isNaN(recordDate.getTime())) return false;
 
-			const isToday = recordDate.toISOString().startsWith(today);
-			return isToday;
+			// Get date in YYYY-MM-DD format for comparison
+			const recordDateStr = recordDate.toISOString().split('T')[0];
+			
+			// Filter based on date range
+			if (dateRange) {
+				const { start, end } = dateRange;
+				return recordDateStr >= start && recordDateStr <= end;
+			}
+			
+			// Fallback to today if no date range provided
+			const today = new Date().toISOString().split("T")[0];
+			return recordDateStr === today;
 		})
 		.reduce((acc: any, curr: any) => {
 			const userId = curr?.userId;
@@ -64,7 +71,7 @@ const StatsCards = ({ attendanceRecords, users }: any) => {
 			img: <Image src={require("../../public/hugeicons_user-group.svg")} alt="employees" />
 		},
 		{
-			title: "Absent Today",
+			title: dateFilter === "Today" ? "Absent Today" : "Absent",
 			value: absentToday.toLocaleString(),
 			color: "#B42318",
 			img: <Image src={require("../../public/solar_user-cross-broken.svg")} alt="absent" />

@@ -26,10 +26,20 @@ const options = {
 };
 
 
-const Chart = ({ chartdata }: any) => {
-	// Group by userId to get earliest clock-in per user (for the day)
-	const checkInRecords = chartdata
-		.filter((record: any) => record.clockIn) // Assuming data has clockIn field
+const Chart = ({ chartdata, dateRange }: any) => {
+	// Filter records by date range if provided
+	const filteredData = dateRange 
+		? chartdata.filter((record: any) => {
+			if (!record.clockIn) return false;
+			const recordDate = new Date(record.clockIn);
+			if (isNaN(recordDate.getTime())) return false;
+			const recordDateStr = recordDate.toISOString().split('T')[0];
+			return recordDateStr >= dateRange.start && recordDateStr <= dateRange.end;
+		})
+		: chartdata.filter((record: any) => record.clockIn);
+
+	// Group by userId to get earliest clock-in per user (for the selected period)
+	const checkInRecords = filteredData
 		.reduce((acc: any, curr: any) => {
 			const userId = curr.userId;
 			if (!acc[userId] || new Date(curr.clockIn) < new Date(acc[userId].clockIn)) {

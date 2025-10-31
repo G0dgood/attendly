@@ -27,6 +27,7 @@ const EmployeeDashBoard = () => {
 		officeId: "",
 		type: ""
 	});
+	const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
 
 	console.log("officeLocations-dataQR", dataQR);
 
@@ -110,6 +111,59 @@ const EmployeeDashBoard = () => {
 		})
 	}
 
+	// Date filter functions
+	const getDateRange = (filter: string) => {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		
+		switch (filter) {
+			case "Today":
+				const todayEnd = new Date(today);
+				todayEnd.setHours(23, 59, 59, 999);
+				return {
+					start: today.toISOString().split('T')[0],
+					end: todayEnd.toISOString().split('T')[0],
+					label: "Today"
+				};
+			case "Yesterday":
+				const yesterday = new Date(today);
+				yesterday.setDate(yesterday.getDate() - 1);
+				const yesterdayEnd = new Date(yesterday);
+				yesterdayEnd.setHours(23, 59, 59, 999);
+				return {
+					start: yesterday.toISOString().split('T')[0],
+					end: yesterdayEnd.toISOString().split('T')[0],
+					label: "Yesterday"
+				};
+			case "Last Week":
+				const lastWeekStart = new Date(today);
+				lastWeekStart.setDate(today.getDate() - 7);
+				return {
+					start: lastWeekStart.toISOString().split('T')[0],
+					end: today.toISOString().split('T')[0],
+					label: "Last Week"
+				};
+			case "Last Month":
+				const lastMonthStart = new Date(today);
+				lastMonthStart.setMonth(today.getMonth() - 1);
+				return {
+					start: lastMonthStart.toISOString().split('T')[0],
+					end: today.toISOString().split('T')[0],
+					label: "Last Month"
+				};
+			default:
+				return {
+					start: today.toISOString().split('T')[0],
+					end: today.toISOString().split('T')[0],
+					label: "Today"
+				};
+		}
+	};
+
+	const handleDateFilter = (filter: string) => {
+		setSelectedDateFilter(filter);
+	};
+
 
 	return (
 		<div className='w-full'>
@@ -119,13 +173,49 @@ const EmployeeDashBoard = () => {
 				</div>
 				<div className='flex flex-col md:flex-row justify-between items-center gap-4  p-4 bg-gray-50 rounded-none'>
 					<div className='flex flex-col md:flex-row gap-2'>
-						<span className="text-sm text-gray-600">Today</span>
+						<span className="text-sm text-gray-600">{getDateRange(selectedDateFilter).label}</span>
 					</div>
 					<div className='flex flex-row gap-2'>
-						<button className="px-3 py-1 text-xs rounded-none border !bg-blue-600 text-white !border-blue-600">Today</button>
-						<button className="px-3 py-1 text-xs rounded-none border !bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50">Yesterday</button>
-						<button className="px-3 py-1 text-xs rounded-none border !bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50">Last Week</button>
-						<button className="px-3 py-1 text-xs rounded-none border !bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50">Last Month</button>
+						<button 
+							onClick={() => handleDateFilter("Today")}
+							className={`px-3 py-1 text-xs rounded-none border ${
+								selectedDateFilter === "Today" 
+									? "!bg-blue-600 text-white !border-blue-600" 
+									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+							}`}
+						>
+							Today
+						</button>
+						<button 
+							onClick={() => handleDateFilter("Yesterday")}
+							className={`px-3 py-1 text-xs rounded-none border ${
+								selectedDateFilter === "Yesterday" 
+									? "!bg-blue-600 text-white !border-blue-600" 
+									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+							}`}
+						>
+							Yesterday
+						</button>
+						<button 
+							onClick={() => handleDateFilter("Last Week")}
+							className={`px-3 py-1 text-xs rounded-none border ${
+								selectedDateFilter === "Last Week" 
+									? "!bg-blue-600 text-white !border-blue-600" 
+									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+							}`}
+						>
+							Last Week
+						</button>
+						<button 
+							onClick={() => handleDateFilter("Last Month")}
+							className={`px-3 py-1 text-xs rounded-none border ${
+								selectedDateFilter === "Last Month" 
+									? "!bg-blue-600 text-white !border-blue-600" 
+									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+							}`}
+						>
+							Last Month
+						</button>
 					</div>
 				</div>
 				<div className='flex flex-row gap-2 w-[100%]  md:w-[27%] pt-[20px] md:p-[0px]'>
@@ -150,6 +240,8 @@ const EmployeeDashBoard = () => {
 				<StatsCards
 					attendanceRecords={attendanceRecord}
 					users={employee}
+					dateFilter={selectedDateFilter}
+					dateRange={getDateRange(selectedDateFilter)}
 				/>
 				<div className='w-[100%] md:w-[30%] h-full md:h-[268px] flex flex-col gap-2'>
 					<QrScanner dataQR={dataQR} isLoadingQR={isLoadingQR} />
@@ -182,7 +274,7 @@ const EmployeeDashBoard = () => {
 					</div>
 
 					<div className='bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)]  w-full h-full '>
-						<Chart chartdata={attendanceRecord} />
+						<Chart chartdata={attendanceRecord} dateRange={getDateRange(selectedDateFilter)} />
 					</div>
 				</div>
 			</div>
