@@ -23,7 +23,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
+  let session = null;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    // Handle JWT decryption errors - invalidate session if secret changed
+    console.error("Session error:", error);
+    session = null;
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
