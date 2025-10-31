@@ -40,11 +40,13 @@ const EmployeeDashBoard = () => {
 
 
 	useEffect(() => {
-		setInputs(prev => ({
-			...prev,
-			officeId: session.user.officeId,
-		}));
-	}, [session.user.officeId]);
+		if (session?.user?.officeId) {
+			setInputs(prev => ({
+				...prev,
+				officeId: session.user.officeId,
+			}));
+		}
+	}, [session?.user?.officeId]);
 
 	// Merge API data with mock "soner"
 	const employee = [
