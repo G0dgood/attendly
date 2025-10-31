@@ -23,7 +23,7 @@ const QrScanner = ({ dataQR, isLoadingQR }: any) => {
 								<Image
 									src={require("../../../public/Barcode.svg")}
 									alt="barcode"
-									className="w-[100%] h-[90%]  object-contain"
+									className="w-[100%] h-[250px]  object-contain"
 								/>
 							)}
 						</div>

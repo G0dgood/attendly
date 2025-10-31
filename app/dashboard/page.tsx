@@ -113,9 +113,20 @@ const EmployeeDashBoard = () => {
 
 	return (
 		<div className='w-full'>
-			<div className='flex flex-col md:flex-row justify-between'>
-				<div className='w-[100%] md:w-[50%]'>
+			<div className='flex flex-col md:flex-row justify-between items-center'>
+				<div>
 					<PageHeader text={"Dashboard Overview"} />
+				</div>
+				<div className='flex flex-col md:flex-row justify-between items-center gap-4  p-4 bg-gray-50 rounded-none'>
+					<div className='flex flex-col md:flex-row gap-2'>
+						<span className="text-sm text-gray-600">Today</span>
+					</div>
+					<div className='flex flex-row gap-2'>
+						<button className="px-3 py-1 text-xs rounded-none border !bg-blue-600 text-white !border-blue-600">Today</button>
+						<button className="px-3 py-1 text-xs rounded-none border !bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50">Yesterday</button>
+						<button className="px-3 py-1 text-xs rounded-none border !bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50">Last Week</button>
+						<button className="px-3 py-1 text-xs rounded-none border !bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50">Last Month</button>
+					</div>
 				</div>
 				<div className='flex flex-row gap-2 w-[100%]  md:w-[27%] pt-[20px] md:p-[0px]'>
 					<Dropdowns
@@ -140,7 +151,7 @@ const EmployeeDashBoard = () => {
 					attendanceRecords={attendanceRecord}
 					users={employee}
 				/>
-				<div className='w-[100%] md:w-[30%] h-full md:h-[345px] flex flex-col gap-2'>
+				<div className='w-[100%] md:w-[30%] h-full md:h-[268px] flex flex-col gap-2'>
 					<QrScanner dataQR={dataQR} isLoadingQR={isLoadingQR} />
 
 				</div>

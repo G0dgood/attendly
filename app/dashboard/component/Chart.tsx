@@ -57,7 +57,7 @@ const Chart = ({ chartdata }: any) => {
 		labels: ['Early', 'Late'],
 		datasets: [{
 			data: [earlyCount, lateCount],
-			backgroundColor: ['#2563EB', '#97BAFF'],
+			backgroundColor: ['#2563EB', '#e8776f'],
 			borderWidth: 1
 		}]
 	};

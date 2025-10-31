@@ -92,7 +92,7 @@ const StatsCards = ({ attendanceRecords, users }: any) => {
 							key={index}
 							className="flex flex-col items-start gap-5 isolate w-full md:w-[50%] h-full bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(16,24,40,0.05)] p-5"
 						>
-							<div className="h-[30%] w-full">
+							<div className="h-[50px] w-full">
 								<div className="flex flex-row gap-2">
 									{item.img}
 									<h2 className="font-montserrat font-semibold text-[18px] leading-6 text-gray-500">
