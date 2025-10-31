@@ -26,10 +26,19 @@ export default async function RootLayout({
   let session = null;
   try {
     session = await getServerSession(authOptions);
-  } catch (error) {
-    // Handle JWT decryption errors - invalidate session if secret changed
-    console.error("Session error:", error);
-    session = null;
+  } catch (error: any) {
+    // Handle JWT decryption errors - this happens when:
+    // 1. NEXTAUTH_SECRET changed but old session cookies exist
+    // 2. Session cookies are corrupted
+    // Setting session to null will force user to re-login
+    if (error?.message?.includes('decryption') || error?.code === 'ERR_JWT_DECRYPTION') {
+      // Silently handle - user will need to login again
+      session = null;
+    } else {
+      // Log other errors for debugging
+      console.error("Session error:", error);
+      session = null;
+    }
   }
 
   return (
