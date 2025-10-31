@@ -10,8 +10,8 @@ import { toast } from 'sonner';
 import QrScanner from './component/QrScanner';
 import Dropdowns from '@/components/CustomDropdown';
 import { useRouter } from 'next/navigation';
-import { 
-	useGetAttendanceQuery, 
+import {
+	useGetAttendanceQuery,
 	useGetAttendanceParamsQuery,
 	useGetUsersParamsQuery,
 	useGetOfficeLocationsQuery,
@@ -81,12 +81,12 @@ const EmployeeDashBoard = () => {
 	const dateRange = getDateRange(selectedDateFilter);
 	const { data: attendanceRecords = {}, isLoading: isLoadingAttendance } = useGetAttendanceQuery(undefined, { skip: selectedDateFilter !== "Today" });
 	const { data: attendanceRecordsCalender = {} } = useGetAttendanceParamsQuery(
-		{ 
-			page: 1, 
-			limit: 500, 
-			filterByDate: 'range', 
-			startDate: dateRange.start, 
-			endDate: dateRange.end 
+		{
+			page: 1,
+			limit: 500,
+			filterByDate: 'range',
+			startDate: dateRange.start,
+			endDate: dateRange.end
 		},
 		{ skip: selectedDateFilter === "Today" }
 	);
@@ -104,16 +104,16 @@ const EmployeeDashBoard = () => {
 	}, [session?.user?.officeId]);
 
 	// Merge API data - ensure arrays
-	const usersData = Array.isArray(usersParams?.data?.users) ? usersParams.data.users : 
-	                  Array.isArray(usersParams?.users) ? usersParams.users : [];
+	const usersData = Array.isArray(usersParams?.data?.users) ? usersParams.data.users :
+		Array.isArray(usersParams?.users) ? usersParams.users : [];
 	const employee = [...usersData];
-	
+
 	const getAttendanceData = (data: any) => {
 		if (Array.isArray(data)) return data;
 		if (data?.data && Array.isArray(data.data)) return data.data;
 		return [];
 	};
-	
+
 	const attendanceRecord = selectedDateFilter !== "Today" && attendanceRecordsCalender?.data
 		? [...getAttendanceData(attendanceRecordsCalender?.data)]
 		: [...getAttendanceData(attendanceRecords?.data)];

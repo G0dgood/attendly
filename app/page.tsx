@@ -8,37 +8,47 @@ import { signIn } from "next-auth/react";
 import { useUserPrivileges } from "@/utils/userPrivileges";
 import { SVGLoader } from "@/components/SVGLoader";
 import { toast } from "sonner";
-
-
+import { useLoginMutation } from "@/utils/APISlice/api";
 
 const Login = () => {
   const router = useRouter()
   const { isSuperAdmin } = useUserPrivileges();
   const [password, setPassword] = React.useState<string>('');
   const [showPassword, setShowPassword] = useState<any>(false);
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
 
-
+  // RTK Query login mutation
+  const [login, { isLoading: loading, error }] = useLoginMutation();
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      callbackUrl: "/dashboard",
-    });
+    try {
+      // Call RTK Query mutation first to validate credentials
+      const result = await login({ email, password }).unwrap();
 
-    setLoading(false);
+      if (result?.data?.user && result?.data?.token) {
+        // If RTK Query succeeds, then call NextAuth to create session with the token
+        const res = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+          callbackUrl: "/dashboard",
+        });
 
-    if (res?.ok) {
-      toast.success("Login successful!");
-      router.push('/dashboard');
-    } else {
-      toast.error("Invalid email or password");
+        if (res?.ok) {
+          toast.success("Login successful!");
+          router.push('/dashboard');
+        } else {
+          toast.error("Session creation failed");
+        }
+      } else {
+        toast.error("Invalid response from server");
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const errorMessage = error?.data?.message || "Invalid email or password";
+      toast.error(errorMessage);
     }
   };
 

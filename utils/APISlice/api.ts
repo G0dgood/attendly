@@ -1,10 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { getSession } from 'next-auth/react';
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://attendance-tracker-backend-8z00.onrender.com';
+
 // Create a custom base query that handles auth headers
 const baseQueryWithAuth = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://attendance-tracker-backend-8z00.onrender.com',
-  prepareHeaders: async (headers) => {
+  baseUrl,
+  prepareHeaders: async (headers, { endpoint }) => {
+    // Don't add auth headers for login endpoint
+    if (endpoint === 'login') {
+      return headers;
+    }
+    
     if (typeof window !== 'undefined') {
       const session = await getSession();
       if (session?.user?.token) {
@@ -20,6 +27,15 @@ export const api = createApi({
   baseQuery: baseQueryWithAuth,
   tagTypes: ['User', 'Attendance', 'OfficeLocation'],
   endpoints: (builder) => ({
+    // Auth endpoints (no auth required)
+    login: builder.mutation<any, { email: string; password: string }>({
+      query: (credentials) => ({
+        url: '/users/login',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
+
     // User endpoints
     getUsers: builder.query<any, void>({
       query: () => '/users',
@@ -132,6 +148,7 @@ export const api = createApi({
 });
 
 export const {
+  useLoginMutation,
   useGetUsersQuery,
   useGetUsersParamsQuery,
   useAddUserMutation,
