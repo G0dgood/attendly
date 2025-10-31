@@ -534,6 +534,11 @@ textarea :hover {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--black);
 }
 
 .container_reg form .user__details .input__box {
@@ -549,6 +554,7 @@ textarea :hover {
 .close-span-icon:hover {
   border: 1px solid var(--accent-blue);
   box-shadow: 0 0 5px var(--accent-blue-light);
+  color: var(--accent-blue);
 }
 
 
@@ -637,4 +643,43 @@ form#ticket-form .form-grp_btn {
 
   /* height: 180px; */
   margin-bottom: 2rem;
+}
+
+
+.flex-date-input {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.de-active {
+  background-color: rgba(255, 0, 0, .159) !important;
+  border: 1px solid red !important;
+  border-radius: 3px !important;
+  color: red !important;
+  padding: 0.15rem 1rem !important;
+}
+
+ 
+
+.container_reg form .user__details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+}
+
+.container_reg form .user__details .input__box {
+  margin-bottom: 20px;
+  width: calc(50% - 20px);
+}
+
+.close-span-icon {
+  padding: 2px;
+  border-radius: 5px;
+}
+
+.close-span-icon:hover {
+  border: 1px solid var(--accent-blue);
+  box-shadow: 0 0 5px var(--accent-blue-light);
 }
