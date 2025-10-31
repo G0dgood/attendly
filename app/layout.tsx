@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import React from "react";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import NewProvider from "./utils/provider";
