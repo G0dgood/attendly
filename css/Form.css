@@ -681,5 +681,5 @@ form#ticket-form .form-grp_btn {
 
 .close-span-icon:hover {
   border: 1px solid var(--accent-blue);
-  box-shadow: 0 0 5px var(--accent-blue-light);
+  box-shadow: 0 0 5px (--accent-blue-light);
 }
