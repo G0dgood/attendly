@@ -75,7 +75,7 @@ const Chart = ({ chartdata }: any) => {
 					</div>
 				</div>
 				<div className='flex flex-row items-center gap-2'>
-					<div className="w-[14px] h-[14px] bg-[#97BAFF] rounded-[2px]"></div>
+					<div className="w-[14px] h-[14px] bg-[#e8776f] rounded-[2px]"></div>
 					<div className="font-montserrat font-medium text-[14px] leading-[18px] text-[#141414]">
 						Late
 					</div>
