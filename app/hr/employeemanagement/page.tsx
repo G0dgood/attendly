@@ -6,13 +6,12 @@ import Search from '@/components/Search';
 import Image from 'next/image';
 import PageHeader from '@/components/PageHeader';
 import { useRouter } from 'next/navigation';
-import { useUserContext } from '@/utils/UserContext';
 import AddEmployeeModal from '@/components/modals/AddEmployeeModal';
 import ManualClockInModal from '@/components/modals/ManualClockInModal';
 import { toast } from 'sonner';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
-import { useGetAttendanceQuery, useAddAttendanceManualMutation } from '@/utils/APISlice/api';
+import { useGetAttendanceQuery, useAddAttendanceManualMutation, useGetUsersParamsQuery, useQrTokenMutation } from '@/utils/APISlice/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorAttendance, setSuccessAttendance } from '@/utils/APISlice/attendanceSlice';
 
@@ -27,62 +26,46 @@ interface User {
 }
 
 const EmployeeDashBoard = () => {
-	const {
-		users,
-		fetchUsersParams,
-		isLoading,
-		dataQR,
-		usersParams,
-		isLoadingparams,
-	}: any = useUserContext();
-
 	const dispatch = useDispatch();
-	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
-	const { data: attendanceRecords } = useGetAttendanceQuery();
-	const [addAttendanceManual, { isLoading: isLoadingAttendance }] = useAddAttendanceManualMutation();
-
 	const router = useRouter();
-	const endDates = new Date();
+	const [currentPage, setCurrentPage] = useState(1);
+	const [limit, setLimit] = useState(10);
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
-	const formattedEndDate = endDates.toISOString().split('T')[0];
-	const totalPages = attendanceRecords?.data?.pages || 1;
-	const [currentPage, setCurrentPage] = useState(1);
 	const [dropFilter, setDropFilter] = useState(false);
-	const [selectedRadio, setSelectedRadio] = useState("Today");
-	const [data, setData] = useState<any>([]);
-	const [limit, setLimit] = useState(10);
-	const [filtered, setFilterd] = useState([]);
-	const [filter, setFilter] = useState<any>([]);
-	const [result, setResult] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
-	const [input, setInput] = useState({
-		token: '',
-		userId: '',
-	});
-
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [isClockInModalOpen, setIsClockInModalOpen] = useState(false);
+	
+	const { dataQR } = useSelector((state: any) => state.user);
+	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
+	
+	const { data: usersParamsData, isLoading: isLoadingparams, refetch: refetchUsers } = useGetUsersParamsQuery({
+		page: currentPage,
+		limit,
+		filterByDate: startDate && endDate ? 'range' : undefined,
+		startDate,
+		endDate,
+	}, {
+		skip: !currentPage || !limit, // Skip if params aren't ready
+	});
+	const { data: attendanceRecords } = useGetAttendanceQuery();
+	const [addAttendanceManual, { isLoading: isLoadingAttendance }] = useAddAttendanceManualMutation();
+	const [triggerQrToken, { isLoading: isLoadingQR }] = useQrTokenMutation();
+	
+	const usersParams = usersParamsData?.data || usersParamsData;
 
 	useEffect(() => {
 		if (successAttendance) {
 			setIsClockInModalOpen(false);
-			fetchUsersParams({ page: currentPage, limit });
+			refetchUsers();
 			dispatch(setSuccessAttendance(null));
 			toast.success('Attendance added successfully!');
 		} else if (errorAttendance) {
 			toast.error(errorAttendance || 'Failed to add attendance.');
 			dispatch(setErrorAttendance(null));
 		}
-	}, [successAttendance, errorAttendance, currentPage, limit, fetchUsersParams]);
-
-	useEffect(() => {
-		fetchUsersParams({ page: currentPage, limit });
-	}, [currentPage, limit]);
-
-	const handleParams = async ({ page, limit }: { page: number; limit: number }) => {
-		await fetchUsersParams({ page, limit });
-	};
+	}, [successAttendance, errorAttendance]);
 
 	const handleClockInClick = (user: any) => {
 		setSelectedUser(user);
@@ -106,16 +89,16 @@ const EmployeeDashBoard = () => {
 
 	const handlePagination = (page: string | number) => {
 		const totalPages = usersParams?.pages;
-		const currentPage = usersParams?.currentPage;
+		const currentPageNum = usersParams?.currentPage;
 
 		if (typeof page === 'string') {
-			if (page === 'prev' && currentPage > 1) {
-				handleParams({ page: currentPage - 1, limit });
-			} else if (page === 'next' && currentPage < totalPages) {
-				handleParams({ page: currentPage + 1, limit });
+			if (page === 'prev' && currentPageNum > 1) {
+				setCurrentPage(currentPageNum - 1);
+			} else if (page === 'next' && currentPageNum < totalPages) {
+				setCurrentPage(currentPageNum + 1);
 			}
 		} else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
-			handleParams({ page, limit });
+			setCurrentPage(page);
 		}
 	};
 
@@ -137,14 +120,10 @@ const EmployeeDashBoard = () => {
 
 
 	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: { page: number; limit: number; filterByDate: string; startDate: string; endDate: string }) => {
-
-		await fetchUsersParams({
-			page,
-			limit,
-			filterByDate: filterByDate,
-			startDate: startDate,
-			endDate: endDate,
-		});
+		setCurrentPage(page);
+		setLimit(limit);
+		setStartDate(startDate);
+		setEndDate(endDate);
 	};
 
 
