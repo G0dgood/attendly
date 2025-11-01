@@ -90,8 +90,8 @@ const EmployeeDashBoard = () => {
 	};
 
 	const handlePagination = (page: string | number) => {
-		const totalPages = usersParams?.pages;
-		const currentPageNum = usersParams?.currentPage;
+		const totalPages = pagination?.pages;
+		const currentPageNum = pagination?.currentPage;
 
 		if (typeof page === 'string') {
 			if (page === 'prev' && currentPageNum > 1) {
@@ -117,8 +117,18 @@ const EmployeeDashBoard = () => {
 		return getStatus(attendanceRecord?.clockIn || null);
 	};
 
-	const pagination = usersParams;
-	const dataToRender = [...(usersParams?.users || usersParams || [])];
+	// Helper function to safely get users data
+	const getUsersData = (data: any) => {
+		if (Array.isArray(data)) return data;
+		if (data?.data?.users && Array.isArray(data.data.users)) return data.data.users;
+		if (data?.data && Array.isArray(data.data)) return data.data;
+		if (data?.users && Array.isArray(data.users)) return data.users;
+		return [];
+	};
+
+	const usersList = getUsersData(usersParamsData);
+	const pagination = usersParamsData?.data || usersParamsData;
+	const dataToRender = [...usersList];
 
 
 	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: { page: number; limit: number; filterByDate: string; startDate: string; endDate: string }) => {
