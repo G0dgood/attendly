@@ -11,7 +11,7 @@ import ManualClockInModal from '@/components/modals/ManualClockInModal';
 import { toast } from 'sonner';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
-import { useGetAttendanceQuery, useAddAttendanceManualMutation, useGetUsersParamsQuery, useQrTokenMutation } from '@/utils/APISlice/api';
+import { useGetAttendanceQuery, useAddAttendanceManualMutation, useGetUsersParamsQuery } from '@/utils/APISlice/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorAttendance, setSuccessAttendance } from '@/utils/APISlice/attendanceSlice';
 
@@ -39,16 +39,15 @@ const EmployeeDashBoard = () => {
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [isClockInModalOpen, setIsClockInModalOpen] = useState(false);
 
-	const { dataQR } = useSelector((state: any) => state.user);
+	const { user } = useSelector((state: any) => state.auth);
 	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
-
+	
 	const { data: usersParamsData = {}, isLoading: isLoadingparams } = useGetUsersParamsQuery({
 		page: currentPage,
 		limit,
 	});
 	const { data: attendanceRecords } = useGetAttendanceQuery();
 	const [addAttendanceManual, { isLoading: isLoadingAttendance }] = useAddAttendanceManualMutation();
-	const [triggerQrToken, { isLoading: isLoadingQR }] = useQrTokenMutation();
 
 	useEffect(() => {
 		if (successAttendance) {
@@ -67,12 +66,11 @@ const EmployeeDashBoard = () => {
 	};
 
 	const confirmManualClockIn = async () => {
-		if (selectedUser) {
-			const token = dataQR?.data?.token || '';
-			const officeId = dataQR?.data?.officeId || '';
+		if (selectedUser && user?.officeId) {
 			const userId = selectedUser.id;
+			const officeId = user.officeId;
 			try {
-				await addAttendanceManual({ token, userId, officeId }).unwrap();
+				await addAttendanceManual({ userId, officeId }).unwrap();
 				dispatch(setSuccessAttendance(true));
 			} catch (error: any) {
 				const errorMsg = error?.data?.message || 'Failed to add attendance';
