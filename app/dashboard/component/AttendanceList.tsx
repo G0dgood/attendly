@@ -1,10 +1,9 @@
 import { NoRecordFound, SVGLoaderFetch } from '@/components/Options';
-import { useAttendance } from '@/utils/AttendanceContext';
 import React from 'react'
+import { useGetAttendanceQuery } from '@/utils/APISlice/api';
 
 const AttendanceList = () => {
-	const attendanceContext: any = useAttendance();
-	const { attendanceRecords, fetchAttendance, isLoading, error } = attendanceContext || {};
+	const { data: attendanceRecords, isLoading } = useGetAttendanceQuery();
 
 	// Merge API data
 	const dataToRender = [

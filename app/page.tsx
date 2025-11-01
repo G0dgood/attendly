@@ -34,7 +34,7 @@ const Login = () => {
           user: result.data.user,
           token: result.data.token
         }));
-        
+
         toast.success("Login successful!");
         router.push('/dashboard');
       } else {

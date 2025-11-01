@@ -3,11 +3,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { api } from './api';
 import authReducer from './authSlice';
+import attendanceReducer from './attendanceSlice';
 
 export const store = configureStore({
   reducer: {
     [api.reducerPath]: api.reducer,
     auth: authReducer,
+    attendance: attendanceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),

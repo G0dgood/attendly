@@ -8,11 +8,13 @@ import PageHeader from '@/components/PageHeader';
 import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/utils/UserContext';
 import AddEmployeeModal from '@/components/modals/AddEmployeeModal';
-import { useAttendance } from '@/utils/AttendanceContext';
 import ManualClockInModal from '@/components/modals/ManualClockInModal';
 import { toast } from 'sonner';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
+import { useGetAttendanceQuery, useAddAttendanceManualMutation } from '@/utils/APISlice/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { setErrorAttendance, setSuccessAttendance } from '@/utils/APISlice/attendanceSlice';
 
 interface User {
 	id: string;
@@ -34,17 +36,10 @@ const EmployeeDashBoard = () => {
 		isLoadingparams,
 	}: any = useUserContext();
 
-	const attendanceContext: any = useAttendance();
-	const {
-		addAttendanceManual,
-		isLoadingAttendance,
-		successAttendance,
-		errorAttendance,
-		setSuccessAttendance,
-		setErrorAttendance,
-		attendanceRecords,
-		fetchAttendance,
-	} = attendanceContext || {};
+	const dispatch = useDispatch();
+	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
+	const { data: attendanceRecords } = useGetAttendanceQuery();
+	const [addAttendanceManual, { isLoading: isLoadingAttendance }] = useAddAttendanceManualMutation();
 
 	const router = useRouter();
 	const endDates = new Date();
@@ -70,22 +65,16 @@ const EmployeeDashBoard = () => {
 	const [isClockInModalOpen, setIsClockInModalOpen] = useState(false);
 
 	useEffect(() => {
-		if (fetchAttendance) {
-			fetchAttendance();
-		}
-	}, []);
-
-	useEffect(() => {
 		if (successAttendance) {
 			setIsClockInModalOpen(false);
 			fetchUsersParams({ page: currentPage, limit });
-			setSuccessAttendance(false);
+			dispatch(setSuccessAttendance(null));
 			toast.success('Attendance added successfully!');
 		} else if (errorAttendance) {
 			toast.error(errorAttendance || 'Failed to add attendance.');
-			setErrorAttendance(null);
+			dispatch(setErrorAttendance(null));
 		}
-	}, [successAttendance, errorAttendance, currentPage, limit, fetchUsersParams, setSuccessAttendance, setErrorAttendance]);
+	}, [successAttendance, errorAttendance, currentPage, limit, fetchUsersParams]);
 
 	useEffect(() => {
 		fetchUsersParams({ page: currentPage, limit });
@@ -100,12 +89,18 @@ const EmployeeDashBoard = () => {
 		setIsClockInModalOpen(true);
 	};
 
-	const confirmManualClockIn = () => {
+	const confirmManualClockIn = async () => {
 		if (selectedUser) {
 			const token = dataQR?.data?.token || '';
 			const officeId = dataQR?.data?.officeId || '';
 			const userId = selectedUser.id;
-			addAttendanceManual({ token, userId, officeId });
+			try {
+				await addAttendanceManual({ token, userId, officeId }).unwrap();
+				dispatch(setSuccessAttendance(true));
+			} catch (error: any) {
+				const errorMsg = error?.data?.message || 'Failed to add attendance';
+				dispatch(setErrorAttendance(errorMsg));
+			}
 		}
 	};
 
