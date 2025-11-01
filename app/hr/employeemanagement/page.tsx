@@ -42,25 +42,17 @@ const EmployeeDashBoard = () => {
 	const { dataQR } = useSelector((state: any) => state.user);
 	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
 
-	const { data: usersParamsData, isLoading: isLoadingparams, refetch: refetchUsers } = useGetUsersParamsQuery({
+	const { data: usersParamsData = {}, isLoading: isLoadingparams } = useGetUsersParamsQuery({
 		page: currentPage,
 		limit,
-		filterByDate: startDate && endDate ? 'range' : undefined,
-		startDate,
-		endDate,
-	}, {
-		skip: !currentPage || !limit, // Skip if params aren't ready
 	});
 	const { data: attendanceRecords } = useGetAttendanceQuery();
 	const [addAttendanceManual, { isLoading: isLoadingAttendance }] = useAddAttendanceManualMutation();
 	const [triggerQrToken, { isLoading: isLoadingQR }] = useQrTokenMutation();
 
-	const usersParams = usersParamsData?.data || usersParamsData;
-
 	useEffect(() => {
 		if (successAttendance) {
 			setIsClockInModalOpen(false);
-			refetchUsers();
 			dispatch(setSuccessAttendance(null));
 			toast.success('Attendance added successfully!');
 		} else if (errorAttendance) {
@@ -117,18 +109,11 @@ const EmployeeDashBoard = () => {
 		return getStatus(attendanceRecord?.clockIn || null);
 	};
 
-	// Helper function to safely get users data
-	const getUsersData = (data: any) => {
-		if (Array.isArray(data)) return data;
-		if (data?.data?.users && Array.isArray(data.data.users)) return data.data.users;
-		if (data?.data && Array.isArray(data.data)) return data.data;
-		if (data?.users && Array.isArray(data.users)) return data.users;
-		return [];
-	};
-
-	const usersList = getUsersData(usersParamsData);
+	// Merge API data - ensure arrays (same as dashboard)
+	const usersData = Array.isArray(usersParamsData?.data?.users) ? usersParamsData.data.users :
+		Array.isArray(usersParamsData?.users) ? usersParamsData.users : [];
+	const dataToRender = [...usersData];
 	const pagination = usersParamsData?.data || usersParamsData;
-	const dataToRender = [...usersList];
 
 
 	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: { page: number; limit: number; filterByDate: string; startDate: string; endDate: string }) => {
