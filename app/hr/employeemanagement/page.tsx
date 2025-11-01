@@ -15,6 +15,8 @@ import { useGetAttendanceQuery, useAddAttendanceManualMutation, useGetUsersParam
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorAttendance, setSuccessAttendance } from '@/utils/APISlice/attendanceSlice';
 
+export const dynamic = 'force-dynamic';
+
 interface User {
 	id: string;
 	name?: string;
@@ -36,10 +38,10 @@ const EmployeeDashBoard = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [isClockInModalOpen, setIsClockInModalOpen] = useState(false);
-	
+
 	const { dataQR } = useSelector((state: any) => state.user);
 	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
-	
+
 	const { data: usersParamsData, isLoading: isLoadingparams, refetch: refetchUsers } = useGetUsersParamsQuery({
 		page: currentPage,
 		limit,
@@ -52,7 +54,7 @@ const EmployeeDashBoard = () => {
 	const { data: attendanceRecords } = useGetAttendanceQuery();
 	const [addAttendanceManual, { isLoading: isLoadingAttendance }] = useAddAttendanceManualMutation();
 	const [triggerQrToken, { isLoading: isLoadingQR }] = useQrTokenMutation();
-	
+
 	const usersParams = usersParamsData?.data || usersParamsData;
 
 	useEffect(() => {
@@ -282,7 +284,7 @@ const EmployeeDashBoard = () => {
 				isLoadingAttendance={isLoadingAttendance}
 			/>
 
-			<AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />
+			{typeof window !== 'undefined' && <AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />}
 		</div>
 	);
 };

@@ -3,9 +3,6 @@ import React, { useEffect } from 'react';
 import { ProgressProvider } from '@bprogress/next/dist/app';
 import { store } from '@/utils/APISlice/store';
 import { Provider, useDispatch } from 'react-redux';
-import { AttendanceProvider } from '@/utils/AttendanceContext';
-import { OfficeLocationProvider } from '@/utils/OfficeLocationContext';
-import { UserProvider } from '@/utils/UserContext';
 import { initializeAuth } from '@/utils/APISlice/authSlice';
 
 const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
@@ -28,13 +25,7 @@ const NewProvider = ({ children }: React.PropsWithChildren) => {
 				options={{ showSpinner: false }}
 				shallowRouting>
 				<AuthInitializer>
-					<UserProvider>
-						<AttendanceProvider>
-							<OfficeLocationProvider>
-								{children}
-							</OfficeLocationProvider>
-						</AttendanceProvider>
-					</UserProvider>
+					{children}
 				</AuthInitializer>
 			</ProgressProvider>
 		</Provider>
