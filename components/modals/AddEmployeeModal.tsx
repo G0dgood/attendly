@@ -16,7 +16,7 @@ interface AddEmployeeModalModalProps {
 
 const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps) => {
 	const [addUser, { isLoading: isLoadingCreate, error }] = useAddUserMutation();
-	const { data: officeLocationsData, isLoading: newisLoading } = useGetOfficeLocationsQuery();
+	const { data: officeLocationsData = {}, isLoading: newisLoading } = useGetOfficeLocationsQuery();
 
 	const [input, setInputs] = useState({
 		name: "",
@@ -28,10 +28,9 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 		officeId: ""
 	});
 
-	// Merge API data with mock "soner"
-	const locationOptions = [
-		...(officeLocationsData?.data || officeLocationsData || [])
-	];
+	// Merge API data - ensure arrays (same as dashboard)
+	const officeLocations = Array.isArray(officeLocationsData?.data) ? officeLocationsData.data : [];
+	const locationOptions = [...officeLocations];
 
 
 
