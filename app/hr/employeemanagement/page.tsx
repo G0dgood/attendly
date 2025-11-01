@@ -41,7 +41,7 @@ const EmployeeDashBoard = () => {
 
 	const { user } = useSelector((state: any) => state.auth);
 	const { successAttendance, errorAttendance } = useSelector((state: any) => state.attendance);
-	
+
 	const { data: usersParamsData = {}, isLoading: isLoadingparams } = useGetUsersParamsQuery({
 		page: currentPage,
 		limit,
@@ -58,7 +58,7 @@ const EmployeeDashBoard = () => {
 			toast.error(errorAttendance || 'Failed to add attendance.');
 			dispatch(setErrorAttendance(null));
 		}
-	}, [successAttendance, errorAttendance]);
+	}, [successAttendance, errorAttendance, dispatch]);
 
 	const handleClockInClick = (user: any) => {
 		setSelectedUser(user);
