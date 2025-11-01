@@ -284,7 +284,7 @@ const EmployeeDashBoard = () => {
 				isLoadingAttendance={isLoadingAttendance}
 			/>
 
-			{typeof window !== 'undefined' && <AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />}
+			<AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />
 		</div>
 	);
 };
