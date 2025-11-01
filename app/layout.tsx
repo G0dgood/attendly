@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import NewProvider from "./utils/provider";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/auth";
 import { Toaster } from "sonner";
 
 // Load Poppins font
@@ -18,22 +16,11 @@ export const metadata: Metadata = {
 
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let session = null;
-  try {
-    session = await getServerSession(authOptions);
-  } catch (error: any) {
-    // Handle JWT decryption errors - this happens when:
-    // 1. NEXTAUTH_SECRET changed but old session cookies exist
-    // 2. Session cookies are corrupted
-    // Silently handle - setting session to null will force user to re-login
-    session = null;
-  }
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -44,7 +31,7 @@ export default async function RootLayout({
       </head>
       <body className={`${poppins.className} antialiased`}>
         <Toaster richColors />
-        <NewProvider session={session}>
+        <NewProvider>
           {children}
         </NewProvider>
       </body>

@@ -1,21 +1,28 @@
 
 "use client";
 import Image from "next/image";
-import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { logout } from '@/utils/APISlice/authSlice';
 
 const Header = () => {
-  const { data: session } = useSession();
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { user } = useSelector((state: any) => state.auth);
   const [menuOpen, setMenuOpen] = useState(false);
 
-
-
   const userInitials =
-    session?.user?.email
+    user?.email
       ?.split("@")[0]
       ?.split(" ")
-      .map((n) => n[0]?.toUpperCase())
+      .map((n: string) => n[0]?.toUpperCase())
       .join("") || "U";
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push('/');
+  };
 
   return (
     <div id="header" className="!flex !justify-between !items-center relative">
@@ -34,10 +41,10 @@ const Header = () => {
 
           <div>
             <h3 className="font-medium text-[14px] leading-[150%] text-[#3A4050]">
-              {session?.user?.fullName || "??"}
+              {user?.fullName || "??"}
             </h3>
             <p className="font-normal text-[12px] leading-[150%] text-[#3A4050]">
-              {session?.user?.role || "??"}
+              {user?.role || "??"}
             </p>
           </div>
         </div>
@@ -49,14 +56,10 @@ const Header = () => {
             <div className="p-4">
               <p className="text-sm text-gray-700 mb-1">Signed in as</p>
               <p className="text-sm font-medium text-gray-900 truncate mb-3">
-                {session?.user?.email || "mike@example.com"}
+                {user?.email || "mike@example.com"}
               </p>
               <button
-                onClick={async () => {
-                  await signOut({
-                    callbackUrl: "/",
-                  })
-                }}
+                onClick={handleLogout}
                 className="w-full px-4 py-2 text-sm text-white !bg-[#2563EB]   hover:bg-blue-700 rounded-none"
               >
                 Sign out

@@ -1,22 +1,33 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ProgressProvider } from '@bprogress/next/dist/app';
-import { SessionProvider } from 'next-auth/react';
 import { store } from '@/utils/APISlice/store';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { AttendanceProvider } from '@/utils/AttendanceContext';
 import { OfficeLocationProvider } from '@/utils/OfficeLocationContext';
 import { UserProvider } from '@/utils/UserContext';
+import { initializeAuth } from '@/utils/APISlice/authSlice';
 
-const NewProvider = ({ children, session }: React.PropsWithChildren<{ session: any }>) => {
+const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		// Initialize auth from localStorage on mount
+		dispatch(initializeAuth());
+	}, [dispatch]);
+
+	return <>{children}</>;
+};
+
+const NewProvider = ({ children }: React.PropsWithChildren) => {
 	return (
-		<SessionProvider session={session}>
+		<Provider store={store}>
 			<ProgressProvider
 				height="4px"
 				color="#2563EB"
 				options={{ showSpinner: false }}
 				shallowRouting>
-				<Provider store={store}>
+				<AuthInitializer>
 					<UserProvider>
 						<AttendanceProvider>
 							<OfficeLocationProvider>
@@ -24,9 +35,9 @@ const NewProvider = ({ children, session }: React.PropsWithChildren<{ session: a
 							</OfficeLocationProvider>
 						</AttendanceProvider>
 					</UserProvider>
-				</Provider>
+				</AuthInitializer>
 			</ProgressProvider>
-		</SessionProvider>
+		</Provider>
 	);
 }
 

@@ -1,23 +1,24 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { getSession } from 'next-auth/react';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://attendance-tracker-backend-8z00.onrender.com';
 
 // Create a custom base query that handles auth headers
 const baseQueryWithAuth = fetchBaseQuery({
   baseUrl,
-  prepareHeaders: async (headers, { endpoint }) => {
+  prepareHeaders: (headers, { getState, endpoint }) => {
     // Don't add auth headers for login endpoint
     if (endpoint === 'login') {
       return headers;
     }
     
-    if (typeof window !== 'undefined') {
-      const session = await getSession();
-      if (session?.user?.token) {
-        headers.set('authorization', `Bearer ${session.user.token}`);
-      }
+    // Get token from Redux state
+    const state = getState() as any;
+    const token = state?.auth?.token;
+    
+    if (token) {
+      headers.set('authorization', `Bearer ${token}`);
     }
+    
     return headers;
   },
 });

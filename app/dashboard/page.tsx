@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react'
 import PageHeader from '@/components/PageHeader'
-import { useSession } from 'next-auth/react';
 import StatsCards from './StatsCards';
 import CustomDateDropdown from '@/components/CustomDateDropdown';
 import AttendanceList from './component/AttendanceList';
@@ -17,10 +16,11 @@ import {
 	useGetOfficeLocationsQuery,
 	useQrTokenMutation
 } from '@/utils/APISlice/api';
+import { useSelector } from 'react-redux';
 
 const EmployeeDashBoard = () => {
 	const router = useRouter();
-	const { data: session }: any = useSession();
+	const { user } = useSelector((state: any) => state.auth);
 	const [inputs, setInputs] = useState({
 		officeId: "",
 		type: ""
@@ -95,13 +95,13 @@ const EmployeeDashBoard = () => {
 	const [triggerQrToken, { isLoading: isLoadingQR }] = useQrTokenMutation();
 
 	useEffect(() => {
-		if (session?.user?.officeId) {
+		if (user?.officeId) {
 			setInputs(prev => ({
 				...prev,
-				officeId: session.user.officeId,
+				officeId: user.officeId,
 			}));
 		}
-	}, [session?.user?.officeId]);
+	}, [user?.officeId]);
 
 	// Merge API data - ensure arrays
 	const usersData = Array.isArray(usersParams?.data?.users) ? usersParams.data.users :

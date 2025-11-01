@@ -4,15 +4,16 @@ import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FiMail, FiLock } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { useUserPrivileges } from "@/utils/userPrivileges";
 import { SVGLoader } from "@/components/SVGLoader";
 import { toast } from "sonner";
 import { useLoginMutation } from "@/utils/APISlice/api";
+import { useDispatch, useSelector } from 'react-redux';
+import { setCredentials } from "@/utils/APISlice/authSlice";
 
 const Login = () => {
   const router = useRouter()
-  const { isSuperAdmin } = useUserPrivileges();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
   const [password, setPassword] = React.useState<string>('');
   const [showPassword, setShowPassword] = useState<any>(false);
   const [email, setEmail] = useState("");
@@ -24,24 +25,18 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      // Call RTK Query mutation first to validate credentials
+      // Call RTK Query mutation to login
       const result = await login({ email, password }).unwrap();
 
       if (result?.data?.user && result?.data?.token) {
-        // If RTK Query succeeds, then call NextAuth to create session with the token
-        const res = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-          callbackUrl: "/dashboard",
-        });
-
-        if (res?.ok) {
-          toast.success("Login successful!");
-          router.push('/dashboard');
-        } else {
-          toast.error("Session creation failed");
-        }
+        // Store credentials in Redux state
+        dispatch(setCredentials({
+          user: result.data.user,
+          token: result.data.token
+        }));
+        
+        toast.success("Login successful!");
+        router.push('/dashboard');
       } else {
         toast.error("Invalid response from server");
       }
@@ -53,10 +48,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (isSuperAdmin) {
+    if (isAuthenticated) {
       router.push('/dashboard');
     }
-  }, [isSuperAdmin]);
+  }, [isAuthenticated]);
 
 
   return (

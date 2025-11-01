@@ -3,23 +3,23 @@ import React, { useState } from 'react'
 import Image from "next/image";
 import PageHeader from '@/components/PageHeader';
 import PersonalInformationView from './PersonalInformationView';
-import { useSession } from 'next-auth/react';
+import { useSelector } from 'react-redux';
 
 
 
 
 const EmployeeDashBoard = () => {
 	const [activeTabs, setActiveTabs] = useState(1);
-	const { data: session } = useSession();
+	const { user } = useSelector((state: any) => state.auth);
 
 
 	return (
 		<div className=''>
 			<div className='flex flex-row justify-between gap-[20px] border border-[#fff] border-b-[#E5E7EB] pb-[20px]'>
 				<PageHeader
-					text={session?.user.fullName}
-					textsup={session?.user.role}
-					textsupSmall={session?.user.email} />
+					text={user?.fullName}
+					textsup={user?.role}
+					textsupSmall={user?.email} />
 				<button
 					// onClick={() => router.push('/hr/addnewemployee')}
 					className="cursor-pointer flex flex-row justify-center items-center px-4 py-[8px] gap-2 h-[40px] !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
@@ -46,9 +46,9 @@ const EmployeeDashBoard = () => {
 							</button>
 						</div>
 
-						<div className='w-full'>
-							<PersonalInformationView session={session} />
-						</div>
+					<div className='w-full'>
+						<PersonalInformationView user={user} />
+					</div>
 					</div>
 
 
