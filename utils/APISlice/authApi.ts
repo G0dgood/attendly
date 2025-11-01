@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://attendance-tracker-backend-8z00.onrender.com';
 
 // Create a custom base query that handles auth headers
-const baseQueryWithAuth = fetchBaseQuery({
+export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl,
   prepareHeaders: (headers, { getState, endpoint }) => {
     // Don't add auth headers for login endpoint
