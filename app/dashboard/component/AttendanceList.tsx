@@ -5,9 +5,16 @@ import { useGetAttendanceQuery } from '@/utils/APISlice/api';
 const AttendanceList = () => {
 	const { data: attendanceRecords, isLoading } = useGetAttendanceQuery();
 
-	// Merge API data
+	// Helper function to safely get attendance data
+	const getAttendanceData = (data: any) => {
+		if (Array.isArray(data)) return data;
+		if (data?.data && Array.isArray(data.data)) return data.data;
+		return [];
+	};
+
+	// Merge API data - ensure arrays
 	const dataToRender = [
-		...(attendanceRecords?.data?.data || attendanceRecords || []).slice(0, 6)
+		...getAttendanceData(attendanceRecords).slice(0, 6)
 	];
 
 	// Determine status based on clockIn time
