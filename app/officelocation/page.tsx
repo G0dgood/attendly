@@ -4,65 +4,35 @@ import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
 import Search from '@/components/Search'
 import Image from "next/image";
-import { useOfficeLocation } from '@/utils/OfficeLocationContext';
 import moment from "moment";
 import OfficeLocationModal from '@/components/modals/OfficeLocationModal';
 import { toast } from 'sonner';
 import OfficeLocationUpdateModal from '@/components/modals/OfficeLocationUpdateModal';
 
 
+import { useGetOfficeLocationsQuery, useAddOfficeLocationMutation, useUpdateOfficeLocationMutation } from '@/utils/APISlice/officeLocationApi';
+
 const Attendance = () => {
-	const {
-		officeLocations,
-		isLoading,
-		fetchOfficeLocations,
-		addOfficeLocation,
-		updateOfficeLocation,
-		error,
-		success,
-		modalOpen,
-		setModalOpen,
-		successUpdate,
-		setSuccessUpdate,
-		setSuccess
-	} = useOfficeLocation()!;
+	const { data: officeData, isLoading } = useGetOfficeLocationsQuery();
+	const [addOfficeLocation, { isSuccess: addSuccess }] = useAddOfficeLocationMutation();
+	const [updateOfficeLocation, { isSuccess: updateSuccess }] = useUpdateOfficeLocationMutation();
+
 	const [isOpen, setIsOpen] = useState(false);
 
+	// Extract data from RTK Query response
+	const officeLocations = officeData?.data?.data || officeData?.data || officeData || [];
 
-	useEffect(() => {
-		fetchOfficeLocations();
-	}, []);
-
-	// Merge API data with mock "soner"
-	const dataToRender = [
-		...(officeLocations?.data || officeLocations || [])
-	];
+	const dataToRender = Array.isArray(officeLocations) ? [...officeLocations] : [];
 
 	console.log("Office Locations", officeLocations);
+
 	useEffect(() => {
-		if (success) {
+		if (addSuccess) {
 			toast.success("Office Locations Created!");
-			fetchOfficeLocations();
-			setSuccess(false)
-		} else if (successUpdate) {
+		} else if (updateSuccess) {
 			toast.success("Office Locations Updated!");
-			fetchOfficeLocations();
-
-
 		}
-	}, [success, successUpdate]);
-
-	useEffect(() => {
-		if (
-			success || successUpdate
-		) {
-			const timer = setTimeout(() => {
-				setSuccess(false);
-				setSuccessUpdate(false)
-			}, 3000);
-			return () => clearTimeout(timer);
-		}
-	}, [success, successUpdate]);
+	}, [addSuccess, updateSuccess]);
 
 	return (
 		<div className='w-full'>

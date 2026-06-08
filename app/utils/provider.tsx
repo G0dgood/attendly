@@ -4,26 +4,32 @@ import { ProgressProvider } from '@bprogress/next/dist/app';
 import { SessionProvider } from 'next-auth/react';
 import { store } from '@/utils/APISlice/store';
 import { Provider } from 'react-redux';
-import { AttendanceProvider } from '@/utils/AttendanceContext';
-import { OfficeLocationProvider } from '@/utils/OfficeLocationContext';
-import { UserProvider } from '@/utils/UserContext';
+import { Toaster } from 'sonner';
 
-const NewProvider = ({ children, session }: React.PropsWithChildren<{ session: any }>) => {
+interface NewProviderProps {
+	children: React.ReactNode;
+	session: any;
+}
+
+const NewProvider: React.FC<NewProviderProps> = ({ children, session }) => {
 	return (
 		<SessionProvider session={session}>
+			<Toaster
+				position="top-right"
+				theme="light"
+				richColors
+				closeButton
+				toastOptions={{
+					style: { borderRadius: 0 },
+				}}
+			/>
 			<ProgressProvider
 				height="4px"
 				color="#2563EB"
 				options={{ showSpinner: false }}
 				shallowRouting>
 				<Provider store={store}>
-					<UserProvider>
-						<AttendanceProvider>
-							<OfficeLocationProvider>
-								{children}
-							</OfficeLocationProvider>
-						</AttendanceProvider>
-					</UserProvider>
+					{children}
 				</Provider>
 			</ProgressProvider>
 		</SessionProvider>

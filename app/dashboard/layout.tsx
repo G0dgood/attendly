@@ -7,7 +7,7 @@ import React from "react";
 
 
 
-function Layout({ children }: never) {
+function Layout({ children }: { children: React.ReactNode }) {
 
 
   return (

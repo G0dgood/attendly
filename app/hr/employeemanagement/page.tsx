@@ -6,9 +6,7 @@ import Search from '@/components/Search';
 import Image from 'next/image';
 import PageHeader from '@/components/PageHeader';
 import { useRouter } from 'next/navigation';
-import { useUserContext } from '@/utils/UserContext';
 import AddEmployeeModal from '@/components/modals/AddEmployeeModal';
-import { useAttendance } from '@/utils/AttendanceContext';
 import ManualClockInModal from '@/components/modals/ManualClockInModal';
 import { toast } from 'sonner';
 import RealPagination from '@/components/RealPagination';
@@ -24,42 +22,30 @@ interface User {
 	email?: string;
 }
 
+import { useGetUsersParamsQuery, useGetUsersQuery } from '@/utils/APISlice/userApi';
+import { useAddAttendanceManualMutation, useGetAttendanceQuery } from '@/utils/APISlice/attendanceApi';
+
 const EmployeeDashBoard = () => {
-	const {
-		users,
-		fetchUsersParams,
-		isLoading,
-		dataQR,
-		usersParams,
-		isLoadingparams,
-	}: any = useUserContext();
-
-	const attendanceContext: any = useAttendance();
-	const {
-		addAttendanceManual,
-		isLoadingAttendance,
-		successAttendance,
-		errorAttendance,
-		setSuccessAttendance,
-		setErrorAttendance,
-		attendanceRecords,
-		fetchAttendance,
-	} = attendanceContext || {};
-
-	const router = useRouter();
-	const endDates = new Date();
+	const [currentPage, setCurrentPage] = useState(1);
+	const [limit, setLimit] = useState(10);
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
-	const formattedEndDate = endDates.toISOString().split('T')[0];
-	const totalPages = attendanceRecords?.data?.pages || 1;
-	const [currentPage, setCurrentPage] = useState(1);
+	const [filterByDate, setFilterByDate] = useState("");
+
+	// RTK Query hooks
+	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersParamsQuery({
+		page: currentPage,
+		limit,
+		filterByDate,
+		startDate,
+		endDate
+	});
+	const { data: attendanceData } = useGetAttendanceQuery();
+	const [addAttendanceManual, { isLoading: isLoadingAttendance, isSuccess: successAttendance, error: errorAttendance }] = useAddAttendanceManualMutation();
+	const { data: qrData } = useGetUsersQuery(); // Or wherever the QR token comes from, let's check dashboard
+
+	const router = useRouter();
 	const [dropFilter, setDropFilter] = useState(false);
-	const [selectedRadio, setSelectedRadio] = useState("Today");
-	const [data, setData] = useState<any>([]);
-	const [limit, setLimit] = useState(10);
-	const [filtered, setFilterd] = useState([]);
-	const [filter, setFilter] = useState<any>([]);
-	const [result, setResult] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
 	const [input, setInput] = useState({
 		token: '',
@@ -69,30 +55,21 @@ const EmployeeDashBoard = () => {
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [isClockInModalOpen, setIsClockInModalOpen] = useState(false);
 
-	useEffect(() => {
-		if (fetchAttendance) {
-			fetchAttendance();
-		}
-	}, [fetchAttendance]);
+	const users = usersData?.data?.users || usersData?.data?.data?.data || usersData?.data?.data || usersData?.data || [];
+	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
 
 	useEffect(() => {
 		if (successAttendance) {
 			setIsClockInModalOpen(false);
-			fetchUsersParams({ page: currentPage, limit });
-			setSuccessAttendance(false);
 			toast.success('Attendance added successfully!');
 		} else if (errorAttendance) {
-			toast.error(errorAttendance || 'Failed to add attendance.');
-			setErrorAttendance(null);
+			toast.error((errorAttendance as any)?.data?.message || 'Failed to add attendance.');
 		}
-	}, [successAttendance, errorAttendance, currentPage, limit, fetchUsersParams, setSuccessAttendance, setErrorAttendance]);
-
-	useEffect(() => {
-		fetchUsersParams({ page: currentPage, limit });
-	}, [currentPage, limit]);
+	}, [successAttendance, errorAttendance]);
 
 	const handleParams = async ({ page, limit }: { page: number; limit: number }) => {
-		await fetchUsersParams({ page, limit });
+		setCurrentPage(page);
+		setLimit(limit);
 	};
 
 	const handleClockInClick = (user: any) => {
@@ -102,22 +79,21 @@ const EmployeeDashBoard = () => {
 
 	const confirmManualClockIn = () => {
 		if (selectedUser) {
-			const token = dataQR?.data?.token || '';
-			const officeId = dataQR?.data?.officeId || '';
-			const userId = selectedUser.id;
-			addAttendanceManual({ token, userId, officeId });
+			// This needs a valid token and officeId. Usually these come from a generated QR or session
+			// For manual clock in, we might need a separate mutation or a way to get the current active token
+			toast.error("Manual clock-in requires an active QR token. Please generate one from the dashboard.");
 		}
 	};
 
 	const handlePagination = (page: string | number) => {
-		const totalPages = usersParams?.pages;
-		const currentPage = usersParams?.currentPage;
+		const totalPages = pagination?.pages;
+		const currentPageNum = pagination?.currentPage;
 
 		if (typeof page === 'string') {
-			if (page === 'prev' && currentPage > 1) {
-				handleParams({ page: currentPage - 1, limit });
-			} else if (page === 'next' && currentPage < totalPages) {
-				handleParams({ page: currentPage + 1, limit });
+			if (page === 'prev' && currentPageNum > 1) {
+				handleParams({ page: currentPageNum - 1, limit });
+			} else if (page === 'next' && currentPageNum < totalPages) {
+				handleParams({ page: currentPageNum + 1, limit });
 			}
 		} else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
 			handleParams({ page, limit });
@@ -133,23 +109,21 @@ const EmployeeDashBoard = () => {
 	};
 
 	const getUserStatus = (userId: string) => {
-		const attendanceRecord = attendanceRecords?.data?.data?.find((record: any) => record.userId === userId);
+		const attendanceRecord = Array.isArray(attendanceRecords)
+			? attendanceRecords.find((record: any) => record.userId === userId)
+			: null;
 		return getStatus(attendanceRecord?.clockIn || null);
 	};
 
-	const pagination = usersParams;
-	const dataToRender = [...(usersParams?.users || usersParams || [])];
+	const dataToRender = Array.isArray(users) ? [...users] : [];
+	const pagination = usersData?.data || usersData || {};
 
-
-	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: { page: number; limit: number; filterByDate: string; startDate: string; endDate: string }) => {
-
-		await fetchUsersParams({
-			page,
-			limit,
-			filterByDate: filterByDate,
-			startDate: startDate,
-			endDate: endDate,
-		});
+	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: any) => {
+		setCurrentPage(page);
+		setLimit(limit);
+		setFilterByDate(filterByDate);
+		setStartDate(startDate);
+		setEndDate(endDate);
 	};
 
 
@@ -215,7 +189,7 @@ const EmployeeDashBoard = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{isLoadingparams ? (
+							{isLoadingUsers ? (
 								<SVGLoaderFetch colSpan={9} />
 							) : dataToRender?.length === 0 ? (
 								<NoRecordFound colSpan={9}>No employee records found!</NoRecordFound>

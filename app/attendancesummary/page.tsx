@@ -4,61 +4,50 @@ import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
 import Search from '@/components/Search'
 import Image from "next/image";
-import { useAttendance } from '@/utils/AttendanceContext';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
 
 
 
+import { useGetAttendanceSummaryQuery } from '@/utils/APISlice/attendanceApi';
+import { useUserPrivileges } from '@/utils/userPrivileges';
+
 const AttendanceSummary = () => {
-	const attendanceContext: any = useAttendance();
-	const { attendanceRecords, attendanceSummary, loadingAttendanceSummary, error, getAttendanceSummary } = attendanceContext || {};
-
-
-	const endDates = new Date();
+	const { user } = useUserPrivileges();
+	const id = user?.officeId;
+	const [currentPage, setCurrentPage] = useState(1);
+	const [limit, setLimit] = useState(10);
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
-	const formattedEndDate = endDates.toISOString().split('T')[0];
-	const totalPages = attendanceRecords?.data?.pages || 1;
-	const [currentPage, setCurrentPage] = useState(1);
 	const [dropFilter, setDropFilter] = useState(false);
-	const [selectedRadio, setSelectedRadio] = useState("Today");
-	const [data, setData] = useState<any>([]);
-	const [limit, setLimit] = useState(10);
-	const [filtered, setFilterd] = useState([]);
-	const [filter, setFilter] = useState<any>([]);
+	const [filterByDate, setFilterByDate] = useState("");
 	const [result, setResult] = useState("");
 
-	const [startDate1] = useState(formattedEndDate);
-	const [endDate1] = useState(formattedEndDate);
+	// RTK Query hook
+	const { data: summaryData, isLoading: loadingAttendanceSummary } = useGetAttendanceSummaryQuery({
+		id: id || '',
+		params: {
+			page: currentPage,
+			limit,
+			filterByDate,
+			startDate,
+			endDate
+		}
+	}, { skip: !id });
 
+	const attendanceSummary = summaryData?.data?.data?.data || summaryData?.data?.data || summaryData?.data || [];
+	const pagination = summaryData?.data?.data || summaryData?.data || {};
 
-	useEffect(() => {// @ts-ignore
-		handleAttendanceParams({ page: currentPage, limit: limit });
-	}, [currentPage, limit]);
+	const dataToRender: any = Array.isArray(attendanceSummary) ? [...attendanceSummary] : [];
 
-
-
-	const pagination = attendanceSummary?.data
-	const dataToRender: any = [
-		...(attendanceSummary.data?.data || attendanceSummary || [])
-	];
-
-	useEffect(() => {
-		setCurrentPage(dataToRender)
-	}, []);
 	console.log("attendanceSummary", attendanceSummary);
 
-
-	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: { page: number; limit: number; filterByDate: string; startDate: string; endDate: string }) => {
-
-		await getAttendanceSummary({
-			page,
-			limit,
-			filterByDate: filterByDate,
-			startDate: startDate,
-			endDate: endDate,
-		});
+	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: any) => {
+		setCurrentPage(page);
+		setLimit(limit);
+		setFilterByDate(filterByDate);
+		setStartDate(startDate);
+		setEndDate(endDate);
 	};
 
 
@@ -175,16 +164,21 @@ const AttendanceSummary = () => {
 							) : dataToRender?.length === 0 ? (
 								<NoRecordFound colSpan={9} />
 							) : dataToRender?.map((record: any) => {
-								const checkIn = record.clockIn
-									? new Date(record.clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+								// Handle both flat attendance records and user-grouped records
+								const attendanceData = record?.attendance?.[0] || record || {};
+								const clockIn = attendanceData.clockIn;
+								const clockOut = attendanceData.clockOut;
+
+								const checkIn = clockIn
+									? new Date(clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 									: '—';
 
-								const checkOut = record.clockOut
-									? new Date(record.clockOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+								const checkOut = clockOut
+									? new Date(clockOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 									: '—';
 
-								const checkInDate = record?.clockIn
-									? new Date(record.clockIn).toLocaleDateString(undefined, {
+								const checkInDate = clockIn
+									? new Date(clockIn).toLocaleDateString(undefined, {
 										weekday: 'short',
 										year: 'numeric',
 										month: 'short',
@@ -192,19 +186,19 @@ const AttendanceSummary = () => {
 									})
 									: '—';
 
-								const totalHour = record.clockIn && record.clockOut
+								const totalHour = clockIn && clockOut
 									? (
-										(new Date(record.clockOut).getTime() -
-											new Date(record.clockIn).getTime()) /
+										(new Date(clockOut).getTime() -
+											new Date(clockIn).getTime()) /
 										(1000 * 60 * 60)
 									).toFixed(2)
 									: '—';
 
-								const employeeName = record?.name || 'N/A';
-								const employeeEmail = record?.email || '—';
+								const employeeName = record?.name || record?.user?.name || 'N/A';
+								const employeeEmail = record?.email || record?.user?.email || '—';
 								const officeLocation = record?.office?.name || '—';
 								const officeAddress = record?.office?.address || '—';
-								const status = getClockInStatus(record.clockIn);
+								const status = getClockInStatus(clockIn);
 
 								return (
 									<tr key={record.id}>
@@ -248,7 +242,7 @@ const AttendanceSummary = () => {
 						<h3 className="text-base font-semibold text-[#050711]">
 							Total {pagination?.data?.length} of {pagination?.total} Attendance Summary
 							<span className="text-sm font-normal text-gray-500 ml-2">
-								Page {pagination?.currentPage} of {pagination?.totalPages}
+								Page {pagination?.currentPage} of {pagination?.pages}
 							</span>
 						</h3>
 					</div>

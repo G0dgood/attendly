@@ -6,39 +6,37 @@ import StatsCards from './StatsCards';
 import CustomDateDropdown from '@/components/CustomDateDropdown';
 import AttendanceList from './component/AttendanceList';
 import Chart from './component/Chart';
-import { useAttendance } from '@/utils/AttendanceContext';
 import { toast } from 'sonner';
-import { useUserContext } from '@/utils/UserContext';
 import QrScanner from './component/QrScanner';
-import { useOfficeLocation } from '@/utils/OfficeLocationContext';
 import Dropdowns from '@/components/CustomDropdown';
 import { SVGLoader } from '@/components/SVGLoader';
 import { useRouter } from 'next/navigation';
 
 
 
+import { useGetAttendanceQuery } from '@/utils/APISlice/attendanceApi';
+import { useGetUsersQuery, useCreateQrTokenMutation } from '@/utils/APISlice/userApi';
+import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
+
 const EmployeeDashBoard = () => {
 	const router = useRouter();
 	const { data: session }: any = useSession();
-	const { attendanceRecords, fetchAttendance, isLoading, error, getCalender, attendanceRecordsCalender }: any = useAttendance();
-	const { users, fetchUsers, qrToken, isLoadingQR, successQR, setSuccessQR, dataQR }: any = useUserContext();
-	const { officeLocations, isLoading: newisLoading, fetchOfficeLocations } = useOfficeLocation()!;
+
+	// RTK Query hooks
+	const { data: attendanceData, isLoading: isLoadingAttendance } = useGetAttendanceQuery();
+	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersQuery();
+	const { data: officeData, isLoading: isLoadingOffice } = useGetOfficeLocationsQuery();
+	const [createQrToken, { isLoading: isLoadingQR }] = useCreateQrTokenMutation();
+
 	const [inputs, setInputs] = useState({
 		officeId: "",
 		type: ""
 	});
 	const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
+	const [dataQR, setDataQR] = useState<any>(null);
 
-	console.log("officeLocations-dataQR", dataQR);
-
-
-	useEffect(() => {
-		if (successQR) {
-			toast.success("QR Create!");
-			setSuccessQR(false)
-		}
-	}, [successQR]);
-
+	// Fetch calender data when filter changes (this will be refactored to use lazy query if needed, 
+	// but for now we'll stick to basic implementation)
 
 	useEffect(() => {
 		if (session?.user?.officeId) {
@@ -49,60 +47,12 @@ const EmployeeDashBoard = () => {
 		}
 	}, [session?.user?.officeId]);
 
-	// Merge API data with mock "soner"
-	const employee = [
-		...(users?.users || users || [])
-	];
-	// Merge API data - use filtered calendar data if date filter is active, otherwise use regular records
-	const attendanceRecord = selectedDateFilter !== "Today" && attendanceRecordsCalender?.data
-		? [
-			...(attendanceRecordsCalender?.data?.data || attendanceRecordsCalender || [])
-		]
-		: [
-			...(attendanceRecords?.data?.data || attendanceRecords || [])
-		];
+	// Extract data from RTK Query responses
+	const users = usersData?.data?.users || usersData?.data?.data?.data || usersData?.data?.data || usersData?.data || [];
+	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
 
-
-
-
-
-	useEffect(() => {
-		const controller = new AbortController();
-
-		const fetchData = async () => {
-			try {
-				await fetchUsers();
-				await fetchAttendance();
-				await fetchOfficeLocations();
-			} catch (error: any) {
-				// toast.error(error.message);
-			}
-		};
-
-		fetchData();
-
-		return () => {
-
-			controller.abort();
-		};
-	}, []);
-
-	// Fetch attendance when date filter changes
-	useEffect(() => {
-		if (getCalender) {
-			const dateRange = getDateRange(selectedDateFilter);
-			getCalender({
-				page: 1,
-				limit: 50,
-				filterByDate: 'range',
-				startDate: dateRange.start,
-				endDate: dateRange.end,
-			});
-		}
-	}, [selectedDateFilter]);
-
-
-
+	const employee = Array.isArray(users) ? [...users] : [];
+	const attendanceRecord = Array.isArray(attendanceRecords) ? [...attendanceRecords] : [];
 
 	const handleOnChange = (input: string, value: string) => {
 		setInputs((prevState) => ({
@@ -111,22 +61,18 @@ const EmployeeDashBoard = () => {
 		}));
 	};
 
-
-
-
-	const handleSubmit = () => {
-
-		qrToken(inputs)
-	}
+	const handleSubmit = async () => {
+		try {
+			const res = await createQrToken(inputs).unwrap();
+			setDataQR(res.data || res);
+			toast.success("QR Create!");
+		} catch (error: any) {
+			toast.error(error?.data?.message || "Failed to create QR");
+		}
+	};
 
 	const handleSubmits = () => {
-		getCalender({
-			page: 1,
-			limit: 50,
-			filterByDate: 'range',
-			startDate: '2025-05-01',
-			endDate: '2025-05-30',
-		})
+		// getCalender logic will be updated later if needed
 	}
 
 	// Date filter functions
@@ -197,8 +143,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Today")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Today"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Today
@@ -206,8 +152,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Yesterday")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Yesterday"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Yesterday
@@ -215,8 +161,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Last Week")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Last Week"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Last Week
@@ -224,8 +170,8 @@ const EmployeeDashBoard = () => {
 						<button
 							onClick={() => handleDateFilter("Last Month")}
 							className={`px-3 py-1 text-xs rounded-none border ${selectedDateFilter === "Last Month"
-									? "!bg-blue-600 text-white !border-blue-600"
-									: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
+								? "!bg-blue-600 text-white !border-blue-600"
+								: "!bg-white !text-gray-700 !border-gray-300 !hover:bg-gray-50"
 								}`}
 						>
 							Last Month

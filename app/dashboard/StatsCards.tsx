@@ -3,9 +3,9 @@ import Image from "next/image";
 const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) => {
 	const totalEmployees = users?.length || 0;
 
-	const dataToRender = [
-		...(attendanceRecords?.data?.data || attendanceRecords || [])
-	];
+	const dataToRender = Array.isArray(attendanceRecords) 
+		? [...attendanceRecords] 
+		: (attendanceRecords?.data?.data || attendanceRecords?.data || []);
 
 	// Filter CHECK_IN records based on selected date range
 	const checkInRecords = dataToRender

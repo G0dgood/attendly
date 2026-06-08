@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import React from "react";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import NewProvider from "./utils/provider";
+import NewProvider from "@/app/utils/provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/auth";
-import { Toaster } from "sonner";
 
 // Load Poppins font
 const poppins = Poppins({
@@ -35,6 +34,9 @@ export default async function RootLayout({
     if (error?.message?.includes('decryption') || error?.code === 'ERR_JWT_DECRYPTION') {
       // Silently handle - user will need to login again
       session = null;
+    } else if (error?.digest?.includes('DYNAMIC_SERVER_USAGE')) {
+      // Re-throw dynamic server usage errors so Next.js handles them correctly
+      throw error;
     } else {
       // Log other errors for debugging
       console.error("Session error:", error);
@@ -51,7 +53,6 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${poppins.className} antialiased`}>
-        <Toaster richColors />
         <NewProvider session={session}>
           {children}
         </NewProvider>

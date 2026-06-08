@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import Input from "../Input";
 import { SVGLoader } from "../SVGLoader";
-import { useOfficeLocation } from "@/utils/OfficeLocationContext";
+import { useGetOfficeLocationsQuery } from "@/utils/APISlice/officeLocationApi";
+import { useRegisterUserMutation } from "@/utils/APISlice/userApi";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "sonner";
-import { useUserContext } from "@/utils/UserContext";
 import DropdownsOffice from "../CustomDropdown";
 import Dropdowns from "../CustomDropdown";
 
@@ -15,15 +15,8 @@ interface AddEmployeeModalModalProps {
 }
 
 const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps) => {
-	const {
-		isLoadingCreate,
-		success,
-		setSuccess,
-		addUser,
-		fetchUsers,
-		error,
-		setError
-	}: any = useUserContext()!;
+	const [addUser, { isLoading: isLoadingCreate, isSuccess: success, error }] = useRegisterUserMutation();
+	const { data: officeData, isLoading: isLoadingOffices } = useGetOfficeLocationsQuery();
 
 	const [input, setInputs] = useState({
 		name: "",
@@ -34,50 +27,23 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 		gender: "",
 		officeId: ""
 	});
-	const { officeLocations, isLoading: newisLoading, fetchOfficeLocations } = useOfficeLocation()!;
 
-
-	useEffect(() => {
-		fetchOfficeLocations();
-	}, []);
-
-	// Merge API data with mock "soner"
-	const locationOptions = [
-		...(officeLocations?.data || officeLocations || [])
-	];
-
-
+	// Merge API data
+	const officeLocations = officeData?.data?.data || officeData?.data || officeData || [];
+	const locationOptions = Array.isArray(officeLocations) ? [...officeLocations] : [];
 
 	useEffect(() => {
 		if (success) {
 			toast.success("Employee Created!");
-			setSuccess(false);
 			setIsOpen(false);
-			// resetForm();
 		}
-		fetchUsers({ page: 1, limit: 10 });
-	}, [success]);
-
-
+	}, [success, setIsOpen]);
 
 	useEffect(() => {
 		if (error) {
-			toast.error(error);
+			toast.error((error as any)?.data?.message || "Failed to create employee");
 		}
 	}, [error]);
-
-
-	useEffect(() => {
-		if (
-			success || error
-		) {
-			const timer = setTimeout(() => {
-				setSuccess(false);
-				setError(null);
-			}, 3000);
-			return () => clearTimeout(timer);
-		}
-	}, [success, error]);
 
 
 
@@ -150,7 +116,7 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 								<Dropdowns
 									label={'Role'}
 									right={''}
-									loading={newisLoading}
+									loading={isLoadingOffices}
 									options={[
 										"ADMIN",
 										"AGENT",

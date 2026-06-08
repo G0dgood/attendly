@@ -4,62 +4,42 @@ import { NoRecordFound, SVGLoaderFetch } from '@/components/Options'
 import PageHeader from '@/components/PageHeader'
 import Search from '@/components/Search'
 import Image from "next/image";
-import { useAttendance } from '@/utils/AttendanceContext';
 import RealPagination from '@/components/RealPagination';
 import { toast } from 'sonner';
 import FilterDropdown from '@/components/FilterDropdown';
-
-
+import { useGetAttendanceParamsQuery } from '@/utils/APISlice/attendanceApi';
 
 const Attendance = () => {
-	const attendanceContext: any = useAttendance();
-	const { attendanceRecords, fetchAttendance, isLoading, error, getAttendanceParams, attendanceRecordsCalender, loadingAttendanceParams } = attendanceContext || {};
 	const endDates = new Date();
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
 	const formattedEndDate = endDates.toISOString().split('T')[0];
-	const totalPages = attendanceRecords?.data?.pages || 1;
 	const [currentPage, setCurrentPage] = useState(1);
 	const [dropFilter, setDropFilter] = useState(false);
-	const [selectedRadio, setSelectedRadio] = useState("Today");
-	const [data, setData] = useState<any>([]);
 	const [limit, setLimit] = useState(10);
-	const [filtered, setFilterd] = useState([]);
-	const [filter, setFilter] = useState<any>([]);
+	const [filterByDate, setFilterByDate] = useState("");
 	const [result, setResult] = useState("");
 
-	const [startDate1] = useState(formattedEndDate);
-	const [endDate1] = useState(formattedEndDate);
+	// RTK Query hook
+	const { data: attendanceData, isLoading: loadingAttendanceParams } = useGetAttendanceParamsQuery({
+		page: currentPage,
+		limit,
+		filterByDate,
+		startDate,
+		endDate,
+	});
 
+	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
+	const pagination = attendanceData?.data?.data || attendanceData?.data || {};
 
-	useEffect(() => {
-		handleAttendanceParams({ page: currentPage, limit: limit });
+	const dataToRender: any = Array.isArray(attendanceRecords) ? [...attendanceRecords] : [];
 
-	}, [currentPage, limit]);
-
-
-
-	const pagination = attendanceRecordsCalender?.data
-	const dataToRender: any = [
-		...(attendanceRecordsCalender?.data?.data || attendanceRecordsCalender || [])
-	];
-
-	useEffect(() => {
-		setCurrentPage(dataToRender)
-	}, []);
-	console.log("attendanceRecordsCalender", attendanceRecordsCalender);
-	// console.log("dataToRender", attendanceRecords.data);
-
-	const handleAttendanceParams = async ({ page, limit }: { page: number; limit: number }) => {
-
-		await getAttendanceParams({
-			page,
-			limit,
-			// Uncomment below if needed
-			// filterByDate: 'range',
-			// startDate: '2025-05-01',
-			// endDate: '2025-05-30',
-		});
+	const handleAttendanceParams = async ({ page, limit, filterByDate, startDate, endDate }: any) => {
+		setCurrentPage(page);
+		setLimit(limit);
+		setFilterByDate(filterByDate);
+		setStartDate(startDate);
+		setEndDate(endDate);
 	};
 
 
@@ -88,19 +68,14 @@ const Attendance = () => {
 
 
 	const handleCustomFilters = () => {
-		const datas = { startDate, endDate }
-		// @ts-ignore
-		getAllResponses(datas)
+		// Logic to be implemented with RTK Query lazy hooks or params update
 		setDropFilter(false)
 	}
 
-
-
-	useEffect(() => {
-		setFilterd(dataToRender);
-		setFilter(dataToRender);
-
-	}, []);
+	// useEffect(() => {
+	// 	setFilterd(dataToRender);
+	// 	setFilter(dataToRender);
+	// }, []);
 
 	// useEffect(() => {
 	// 	const results = filter?.filter(
@@ -173,7 +148,7 @@ const Attendance = () => {
 								handleAttendanceParams({
 									page: 1,
 									limit,
-									// @ts-ignore
+									filterByDate: 'range',
 									startDate,
 									endDate,
 								});

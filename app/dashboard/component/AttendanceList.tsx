@@ -1,21 +1,12 @@
 import { NoRecordFound, SVGLoaderFetch } from '@/components/Options';
-import { useAttendance } from '@/utils/AttendanceContext';
-import React, { useEffect, useState } from 'react'
+import { useGetAttendanceQuery } from '@/utils/APISlice/attendanceApi';
 
 const AttendanceList = () => {
-	const attendanceContext: any = useAttendance();
-	const { attendanceRecords, fetchAttendance, isLoading, error } = attendanceContext || {};
-
-	useEffect(() => {
-		if (fetchAttendance) {
-			fetchAttendance();
-		}
-	}, []);
+	const { data: attendanceData, isLoading, error } = useGetAttendanceQuery();
 
 	// Merge API data
-	const dataToRender = [
-		...(attendanceRecords?.data?.data || attendanceRecords || []).slice(0, 6)
-	];
+	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
+	const dataToRender = Array.isArray(attendanceRecords) ? [...attendanceRecords].slice(0, 6) : [];
 
 	// Determine status based on clockIn time
 	const getStatus = (clockIn: string | null) => {

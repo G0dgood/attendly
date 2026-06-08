@@ -1,14 +1,13 @@
-// src/app/store.ts or wherever your Redux store is
-
 import { configureStore } from '@reduxjs/toolkit';
-import { authApi } from './userApi';
- 
+import { baseApi } from './baseApi';
 
 export const store = configureStore({
   reducer: {
-    [authApi.reducerPath]: authApi.reducer,
-    // ...your other reducers
+    [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware),
+    getDefaultMiddleware().concat(baseApi.middleware),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

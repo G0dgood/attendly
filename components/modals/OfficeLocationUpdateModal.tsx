@@ -2,25 +2,12 @@
 import { useState, useEffect } from "react";
 import Input from "../Input";
 import { SVGLoader } from "../SVGLoader";
-import { useOfficeLocation } from "@/utils/OfficeLocationContext";
+import { useUpdateOfficeLocationMutation } from "@/utils/APISlice/officeLocationApi";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "sonner";
 
-interface OfficeLocationModalProps {
-	isOpen: boolean;
-	setIsOpen: (isOpen: boolean) => void;
-}
-
 const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) => {
-	const {
-		isLoadingUpdate,
-		updateOfficeLocation,
-		setSuccessUpdate,
-		successUpdate,
-		fetchOfficeLocations,
-		officeLocationsError
-	} = useOfficeLocation()!;
-
+	const [updateOfficeLocation, { isLoading: isLoadingUpdate, isSuccess: successUpdate }] = useUpdateOfficeLocationMutation();
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [inputs, setInputs] = useState({
@@ -40,7 +27,6 @@ const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) 
 
 	useEffect(() => {
 		if (successUpdate) {
-			setSuccessUpdate(false);
 			setIsOpen(false);
 			resetForm();
 		}
@@ -55,10 +41,12 @@ const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) 
 
 	const resetForm = () => { setInputs({ name: "", address: "", }) };
 
-
-
 	const handleSubmit = async () => {
-		updateOfficeLocation(id, inputs)
+		try {
+			await updateOfficeLocation({ id, body: inputs }).unwrap();
+		} catch (error: any) {
+			toast.error(error?.data?.message || "Failed to update office location");
+		}
 	}
 	useEffect(() => {
 		document.body.style.overflow = isOpen ? "hidden" : "auto";

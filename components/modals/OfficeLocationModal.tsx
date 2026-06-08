@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Input from "../../components/Input";
 import { SVGLoader } from "../../components/SVGLoader";
-import { useOfficeLocation } from "@/utils/OfficeLocationContext";
+import { useAddOfficeLocationMutation } from "@/utils/APISlice/officeLocationApi";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "sonner";
 
@@ -12,12 +12,7 @@ interface OfficeLocationModalProps {
 }
 
 const OfficeLocationModal = ({ isOpen, setIsOpen }: OfficeLocationModalProps) => {
-	const {
-		isLoadingUpdate,
-		addOfficeLocation,
-		success,
-		setSuccess,
-	} = useOfficeLocation()!;
+	const [addOfficeLocation, { isLoading: isLoadingUpdate, isSuccess: success }] = useAddOfficeLocationMutation();
 
 	const [inputs, setInputs] = useState({
 		name: "",
@@ -26,12 +21,10 @@ const OfficeLocationModal = ({ isOpen, setIsOpen }: OfficeLocationModalProps) =>
 
 	useEffect(() => {
 		if (success) {
-			setSuccess(false);
 			setIsOpen(false);
 			resetForm();
 		}
-	}, [success]);
-
+	}, [success, setIsOpen]);
 
 	const handleOnChange = (input: string, value: string) => {
 		setInputs((prevState) => ({
@@ -43,11 +36,11 @@ const OfficeLocationModal = ({ isOpen, setIsOpen }: OfficeLocationModalProps) =>
 	const resetForm = () => { setInputs({ name: "", address: "", }) };
 
 	const handleSubmit = async () => {
-		// Validate form before submission
-		// if (!validateForm()) {
-		// 	return;
-		// }
-		addOfficeLocation(inputs.name, inputs.address)
+		try {
+			await addOfficeLocation({ name: inputs.name, address: inputs.address }).unwrap();
+		} catch (error: any) {
+			toast.error(error?.data?.message || "Failed to add office location");
+		}
 	}
 
 	useEffect(() => {
