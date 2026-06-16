@@ -5,6 +5,7 @@ import { SVGLoader } from "../../components/SVGLoader";
 import { useAddOfficeLocationMutation } from "@/utils/APISlice/officeLocationApi";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 interface OfficeLocationModalProps {
 	isOpen: boolean;
@@ -39,7 +40,7 @@ const OfficeLocationModal = ({ isOpen, setIsOpen }: OfficeLocationModalProps) =>
 		try {
 			await addOfficeLocation({ name: inputs.name, address: inputs.address }).unwrap();
 		} catch (error: any) {
-			toast.error(error?.data?.message || "Failed to add office location");
+			toast.error(getErrorMessage(error, "Failed to add office location"));
 		}
 	}
 

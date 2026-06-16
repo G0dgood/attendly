@@ -5,6 +5,7 @@ import { SVGLoader } from "../SVGLoader";
 import { useUpdateOfficeLocationMutation } from "@/utils/APISlice/officeLocationApi";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) => {
 	const [updateOfficeLocation, { isLoading: isLoadingUpdate, isSuccess: successUpdate }] = useUpdateOfficeLocationMutation();
@@ -45,7 +46,7 @@ const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) 
 		try {
 			await updateOfficeLocation({ id, body: inputs }).unwrap();
 		} catch (error: any) {
-			toast.error(error?.data?.message || "Failed to update office location");
+			toast.error(getErrorMessage(error, "Failed to update office location"));
 		}
 	}
 	useEffect(() => {
