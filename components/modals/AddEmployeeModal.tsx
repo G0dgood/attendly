@@ -6,6 +6,7 @@ import { useGetOfficeLocationsQuery } from "@/utils/APISlice/officeLocationApi";
 import { useRegisterUserMutation } from "@/utils/APISlice/userApi";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import DropdownsOffice from "../CustomDropdown";
 import Dropdowns from "../CustomDropdown";
 
@@ -32,6 +33,24 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 	const officeLocations = officeData?.data?.data || officeData?.data || officeData || [];
 	const locationOptions = Array.isArray(officeLocations) ? [...officeLocations] : [];
 
+	const resetForm = () => {
+		setInputs({
+			name: "",
+			email: "",
+			password: "123456",
+			phone: "",
+			role: "",
+			gender: "",
+			officeId: ""
+		});
+	};
+
+	useEffect(() => {
+		if (!isOpen) {
+			resetForm();
+		}
+	}, [isOpen]);
+
 	useEffect(() => {
 		if (success) {
 			toast.success("Employee Created!");
@@ -41,18 +60,13 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 
 	useEffect(() => {
 		if (error) {
-			toast.error((error as any)?.data?.message || "Failed to create employee");
+			toast.error(getErrorMessage(error, "Failed to create employee"));
 		}
 	}, [error]);
-
-
-
 
 	const handleOnChange = (name: string, value: string) => {
 		setInputs((prev) => ({ ...prev, [name]: value }));
 	};
-
-	// const resetForm = () => { setInputs({ firstName: "", address: "", }) };
 
 	const handleSubmit = () => {
 		// Validate form before submission
@@ -87,7 +101,7 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 									className="text-gray-500 hover:text-gray-800 rounded-none"
 									onClick={() => {
 										setIsOpen(false);
-										// resetForm();
+										resetForm();
 									}}
 								>
 									<AiOutlineClose size={20} />
@@ -166,6 +180,7 @@ const AddEmployeeModalModal = ({ isOpen, setIsOpen }: AddEmployeeModalModalProps
 								<button
 									onClick={() => {
 										setIsOpen(false);
+										resetForm();
 									}}
 									className="btn_model_outline rounded-none"
 								>

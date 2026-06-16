@@ -7,6 +7,7 @@ import CustomDateDropdown from '@/components/CustomDateDropdown';
 import AttendanceList from './component/AttendanceList';
 import Chart from './component/Chart';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import QrScanner from './component/QrScanner';
 import Dropdowns from '@/components/CustomDropdown';
 import { SVGLoader } from '@/components/SVGLoader';
@@ -67,7 +68,7 @@ const EmployeeDashBoard = () => {
 			setDataQR(res.data || res);
 			toast.success("QR Create!");
 		} catch (error: any) {
-			toast.error(error?.data?.message || "Failed to create QR");
+			toast.error(getErrorMessage(error, "Failed to create QR"));
 		}
 	};
 

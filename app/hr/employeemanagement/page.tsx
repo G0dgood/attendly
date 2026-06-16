@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import AddEmployeeModal from '@/components/modals/AddEmployeeModal';
 import ManualClockInModal from '@/components/modals/ManualClockInModal';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
 
@@ -63,7 +64,7 @@ const EmployeeDashBoard = () => {
 			setIsClockInModalOpen(false);
 			toast.success('Attendance added successfully!');
 		} else if (errorAttendance) {
-			toast.error((errorAttendance as any)?.data?.message || 'Failed to add attendance.');
+			toast.error(getErrorMessage(errorAttendance, 'Failed to add attendance.'));
 		}
 	}, [successAttendance, errorAttendance]);
 
