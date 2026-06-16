@@ -62,7 +62,7 @@ const OfficeLocationModal = ({ isOpen, setIsOpen }: OfficeLocationModalProps) =>
 					<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
 						<div className="bg-white w-[700px] max-w-[95vw] max-h-[90vh] rounded-[5px] flex flex-col shadow-xl relative">
 							{/* Header */}
-							<div className="p-6   border-b flex justify-between items-center sticky top-0 z-10 bg-white rounded-t-[32px]">
+							<div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10 bg-white rounded-t-[32px]">
 								<h3 className="text-lg font-semibold">Create Office</h3>
 								<button
 									className="text-gray-500 hover:text-gray-800 rounded-none"
@@ -94,7 +94,7 @@ const OfficeLocationModal = ({ isOpen, setIsOpen }: OfficeLocationModalProps) =>
 							</div>
 
 							{/* Footer */}
-							<div className="p-6 border-t flex justify-end bg-white rounded-b-[32px]">
+							<div className="p-6 border-t border-gray-100 flex justify-end bg-white rounded-b-[32px]">
 								<button
 									onClick={() => {
 										setIsOpen(false);

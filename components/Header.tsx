@@ -49,7 +49,7 @@ const Header = () => {
             <div className="p-4">
               <p className="text-sm text-gray-700 mb-1">Signed in as</p>
               <p className="text-sm font-medium text-gray-900 truncate mb-3">
-                {session?.user?.email || "mike@example.com"}
+                {session?.user?.email || ""}
               </p>
               <button
                 onClick={async () => {
