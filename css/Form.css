@@ -683,3 +683,11 @@ form#ticket-form .form-grp_btn {
   border: 1px solid var(--accent-blue);
   box-shadow: 0 0 5px (--accent-blue-light);
 }
+
+/* Override padding for custom rectangular input components inside forms */
+form input.custom-input-field,
+form input[type="text"].custom-input-field,
+form input[type="email"].custom-input-field,
+form input[type="password"].custom-input-field {
+  padding: 8px 16px !important;
+}

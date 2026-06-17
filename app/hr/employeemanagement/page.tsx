@@ -246,7 +246,7 @@ const EmployeeDashBoard = () => {
 													<button className="cursor-pointer">
 														<Image src={require('../../../public/Trash_light.svg')} alt="delete" />
 													</button>
-													<button className="cursor-pointer" onClick={() => router.push(`/hr/viewemployee`)}>
+													<button className="cursor-pointer" onClick={() => router.push(`/hr/viewemployee?id=${user.id}`)}>
 														<Image src={require('../../../public/View_light.svg')} alt="view" />
 													</button>
 												</div>

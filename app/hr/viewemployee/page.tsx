@@ -1,25 +1,53 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import Image from "next/image";
 import PageHeader from '@/components/PageHeader';
 import PersonalInformationView from './PersonalInformationView';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
+import { useGetUserByIdQuery } from '@/utils/APISlice/userApi';
+import { SVGLoader } from '@/components/SVGLoader';
 
-
-
-
-const EmployeeDashBoard = () => {
+const ViewEmployeeContent = () => {
 	const [activeTabs, setActiveTabs] = useState(1);
 	const { data: session } = useSession();
+	const searchParams = useSearchParams();
+	const employeeId = searchParams.get('id');
 
+	// Query user if ID is present in search parameters
+	const { data: employeeData, isLoading: isLoadingEmployee } = useGetUserByIdQuery(
+		employeeId || '',
+		{ skip: !employeeId }
+	);
+
+	if (employeeId && isLoadingEmployee) {
+		return (
+			<div className="flex justify-center items-center h-[300px] w-full">
+				<SVGLoader width="40px" height="40px" color="#2563EB" />
+			</div>
+		);
+	}
+
+	const displayUser = employeeId
+		? (employeeData?.data?.user || employeeData?.data?.data || employeeData?.data || employeeData)
+		: session?.user;
+
+	// In case there is no user loaded and no session
+	if (!displayUser) {
+		return (
+			<div className="flex justify-center items-center h-[300px] w-full">
+				<p className="text-gray-500 font-medium">No employee information found.</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className=''>
 			<div className='flex flex-row justify-between gap-[20px] border border-[#fff] border-b-[#E5E7EB] pb-[20px]'>
 				<PageHeader
-					text={session?.user.fullName}
-					textsup={session?.user.role}
-					textsupSmall={session?.user.email} />
+					text={displayUser?.fullName || displayUser?.name}
+					textsup={displayUser?.role}
+					textsupSmall={displayUser?.email} />
 				<button
 					// onClick={() => router.push('/hr/addnewemployee')}
 					className="cursor-pointer flex flex-row justify-center items-center px-4 py-[8px] gap-2 h-[40px] !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
@@ -47,18 +75,25 @@ const EmployeeDashBoard = () => {
 						</div>
 
 						<div className='w-full'>
-							<PersonalInformationView session={session} />
+							<PersonalInformationView user={displayUser} />
 						</div>
 					</div>
-
-
 				</div>
-
 			</div>
-
-
 		</div>
 	)
 }
 
-export default EmployeeDashBoard
+const EmployeeDashBoard = () => {
+	return (
+		<Suspense fallback={
+			<div className="flex justify-center items-center h-[300px] w-full">
+				<SVGLoader width="40px" height="40px" color="#2563EB" />
+			</div>
+		}>
+			<ViewEmployeeContent />
+		</Suspense>
+	);
+}
+
+export default EmployeeDashBoard;
