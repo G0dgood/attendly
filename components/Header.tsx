@@ -61,7 +61,7 @@ const Header = () => {
                   setMenuOpen(false);
                   router.push("/profile");
                 }}
-                className="w-full px-4 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-center cursor-pointer font-medium"
+                className="w-full px-4 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-center cursor-pointer font-medium rounded-none"
               >
                 Profile Settings
               </button>

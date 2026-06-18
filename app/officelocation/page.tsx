@@ -18,11 +18,21 @@ const Attendance = () => {
 	const [updateOfficeLocation, { isSuccess: updateSuccess }] = useUpdateOfficeLocationMutation();
 
 	const [isOpen, setIsOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
 
 	// Extract data from RTK Query response
 	const officeLocations = officeData?.data?.data || officeData?.data || officeData || [];
 
-	const dataToRender = Array.isArray(officeLocations) ? [...officeLocations] : [];
+	const dataToRender = Array.isArray(officeLocations)
+		? officeLocations.filter((office: any) => {
+			const query = searchQuery.toLowerCase();
+			return (
+				office.name?.toLowerCase().includes(query) ||
+				office.address?.toLowerCase().includes(query) ||
+				office.id?.toLowerCase().includes(query)
+			);
+		})
+		: [];
 
 	console.log("Office Locations", officeLocations);
 
@@ -39,7 +49,11 @@ const Attendance = () => {
 			<PageHeader text={"Office Location"} />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6'>
-				<Search />
+				<Search
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					placeholder="Search office location..."
+				/>
 
 				<div className='flex flex-col md:flex-row gap-5'>
 
