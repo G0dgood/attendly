@@ -27,13 +27,36 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    updateUser: builder.mutation<any, { userId: string; updatedData: any }>({
-      query: ({ userId, updatedData }) => ({
+    updateUser: builder.mutation<any, { userId: string; body: any }>({
+      query: ({ userId, body }) => ({
         url: `/users/${userId}`,
         method: 'PATCH',
-        body: { data: updatedData },
+        body,
       }),
       invalidatesTags: ['User'],
+    }),
+    getUserById: builder.query<any, string>({
+      query: (id) => `/users/${id}`,
+      providesTags: ['User'],
+    }),
+    getUser: builder.query<any, string>({
+      query: (id) => `/users/${id}`,
+      providesTags: ['User'],
+    }),
+    updateProfile: builder.mutation<any, any>({
+      query: (body) => ({
+        url: '/users/update-profile',
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    updatePassword: builder.mutation<any, any>({
+      query: (body) => ({
+        url: '/users/update-password',
+        method: 'PATCH',
+        body,
+      }),
     }),
     createQrToken: builder.mutation<any, any>({
       query: (body) => ({
@@ -50,5 +73,9 @@ export const {
   useGetUsersParamsQuery,
   useRegisterUserMutation,
   useUpdateUserMutation,
+  useGetUserByIdQuery,
+  useGetUserQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
   useCreateQrTokenMutation,
 } = userApi;

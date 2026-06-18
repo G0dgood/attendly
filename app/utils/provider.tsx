@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { store } from '@/utils/APISlice/store';
 import { Provider } from 'react-redux';
 import { Toaster } from 'sonner';
+import NetworkStatusHandler from '@/components/NetworkStatusHandler';
 
 interface NewProviderProps {
 	children: React.ReactNode;
@@ -23,6 +24,7 @@ const NewProvider: React.FC<NewProviderProps> = ({ children, session }) => {
 					style: { borderRadius: 0 },
 				}}
 			/>
+			<NetworkStatusHandler />
 			<ProgressProvider
 				height="4px"
 				color="#2563EB"

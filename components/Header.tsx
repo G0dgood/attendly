@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
 
 
@@ -46,18 +48,30 @@ const Header = () => {
         {menuOpen && (
           <div className="absolute right-0 top-[60px] w-[200px] bg-white border border-gray-200   shadow-lg z-50">
             <div className="absolute top-[-6px] right-5 w-3 h-3 bg-white rotate-45 border-t border-l border-gray-200"></div>
-            <div className="p-4">
-              <p className="text-sm text-gray-700 mb-1">Signed in as</p>
-              <p className="text-sm font-medium text-gray-900 truncate mb-3">
-                {session?.user?.email || ""}
-              </p>
+            <div className="p-4 flex flex-col gap-2">
+              <div>
+                <p className="text-sm text-gray-700 mb-0.5">Signed in as</p>
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {session?.user?.email || ""}
+                </p>
+              </div>
+              <hr className="border-gray-100 my-1" />
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  router.push("/profile");
+                }}
+                className="w-full px-4 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-center cursor-pointer font-medium rounded-none"
+              >
+                Profile Settings
+              </button>
               <button
                 onClick={async () => {
                   await signOut({
                     callbackUrl: "/",
                   })
                 }}
-                className="w-full px-4 py-2 text-sm text-white !bg-[#2563EB]   hover:bg-blue-700 rounded-none"
+                className="w-full px-4 py-2 text-sm text-white !bg-[#2563EB]   hover:bg-blue-700 rounded-none text-center cursor-pointer font-medium"
               >
                 Sign out
               </button>
