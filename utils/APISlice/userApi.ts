@@ -65,6 +65,18 @@ export const userApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    uploadUsers: builder.mutation<any, { officeId: string; file: File }>({
+      query: ({ officeId, file }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        return {
+          url: `/users/upload/${officeId}`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -78,4 +90,6 @@ export const {
   useUpdateProfileMutation,
   useUpdatePasswordMutation,
   useCreateQrTokenMutation,
+  useUploadUsersMutation,
 } = userApi;
+

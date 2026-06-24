@@ -8,6 +8,7 @@ import PageHeader from '@/components/PageHeader';
 import { useRouter } from 'next/navigation';
 import AddEmployeeModal from '@/components/modals/AddEmployeeModal';
 import ManualClockInModal from '@/components/modals/ManualClockInModal';
+import UploadUsersModal from '@/components/modals/UploadUsersModal';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import RealPagination from '@/components/RealPagination';
@@ -48,6 +49,7 @@ const EmployeeDashBoard = () => {
 	const router = useRouter();
 	const [dropFilter, setDropFilter] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [isUploadOpen, setIsUploadOpen] = useState(false);
 	const [input, setInput] = useState({
 		token: '',
 		userId: '',
@@ -135,6 +137,12 @@ const EmployeeDashBoard = () => {
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6 '>
 				<Search />
 				<div className='flex flex-col md:flex-row gap-5 relative'>
+					<button
+						onClick={() => setIsUploadOpen(true)}
+						className="cursor-pointer flex flex-col md:flex-row justify-center items-center gap-2 px-4 h-[40px] border border-[#2563EB] !bg-white hover:!bg-gray-50 font-normal text-[14px] leading-[150%] text-[#2563EB] rounded-none transition"
+					>
+						Bulk Upload
+					</button>
 					<button
 						onClick={() => setIsOpen(true)}
 						className="cursor-pointer flex flex-col md:flex-row justify-center items-center gap-2 md:w-[150px] h-[40px] !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
@@ -284,6 +292,7 @@ const EmployeeDashBoard = () => {
 			/>
 
 			<AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />
+			<UploadUsersModal isOpen={isUploadOpen} setIsOpen={setIsUploadOpen} />
 		</div>
 	);
 };

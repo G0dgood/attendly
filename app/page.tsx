@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const router = useRouter()
-  const { isSuperAdmin } = useUserPrivileges();
+  const { isSuperAdmin, isAdmin } = useUserPrivileges();
   const [password, setPassword] = React.useState<string>('');
   const [showPassword, setShowPassword] = useState<any>(false);
   const [loading, setLoading] = useState(false);
@@ -38,15 +38,17 @@ const Login = () => {
       toast.success("Login successful!");
       router.push('/dashboard');
     } else {
-      toast.error("Invalid email or password");
+      const errMsg = res?.error && res.error !== "CredentialsSignin" ? res.error : "Invalid email or password";
+      toast.error(errMsg);
     }
   };
 
   useEffect(() => {
-    if (isSuperAdmin) {
+    if (isSuperAdmin || isAdmin) {
       router.push('/dashboard');
     }
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, isAdmin]);
+
 
 
   return (
@@ -69,7 +71,7 @@ const Login = () => {
         </div>
       </div>
       <div className="login-form-container">
-        <div className="form-container_text">
+        <div className="form-container_text mb-4">
           <h1>Welcome back</h1>
           <p>Enter your credentials to access your account.</p>
         </div>
@@ -81,7 +83,9 @@ const Login = () => {
               type="text"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
             />
           </div>
           <div className="form-ctrl">
@@ -91,7 +95,9 @@ const Login = () => {
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
             />
 
             <span id="i-FaEye" onClick={() => setShowPassword(!showPassword)}>

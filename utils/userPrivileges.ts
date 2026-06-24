@@ -8,20 +8,12 @@ export function useUserPrivileges() {
   const user = session?.user ?? null;
 
   const isSuperAdmin = userType === "SuperAdmin";
-  const isAdmin = userType === "admin";
-  const isAgencyCreator = userType === "agency_creator";
-  const isAgencyApprover = userType === "agency_approver";
-  const isFinancialApprover = userType === "financial_approver";
-  const isClient = userType === "client";
+  const isAdmin = userType === "admin"; 
   const token = userToken  
 
   return {
     isSuperAdmin,
-    isAdmin,
-    isAgencyCreator,
-    isAgencyApprover,
-    isFinancialApprover,
-    isClient,
+    isAdmin, 
     token,
     user
   };
