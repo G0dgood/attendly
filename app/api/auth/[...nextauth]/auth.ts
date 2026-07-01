@@ -58,6 +58,10 @@ export const authOptions: AuthOptions = {
 
           const { user, token } = res.data.data;
 
+          if (user?.role?.toUpperCase() === "AGENT") {
+            throw new Error("Access Denied: Agents are not allowed to log in to the web application.");
+          }
+
           if (user && token) {
             return {
               id: user.id,
