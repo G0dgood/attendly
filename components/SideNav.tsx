@@ -10,18 +10,29 @@ import dashboardWhite from "../public/DashboardIcon/dashboardWhite.svg";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useUserPrivileges } from "@/utils/userPrivileges";
 
 const SideNav: React.FC = () => {
   const pathname = usePathname();
+  const { user } = useUserPrivileges();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
+  const userRole = user?.role?.toUpperCase();
+
   const menuItems = [
-    { label: "Dashboard", icon: dashboard, iconWhite: dashboardWhite, path: "/dashboard" },
-    { label: "Employee", icon: employee, iconWhite: employeeWhite, path: "/hr/employeemanagement" },
-    { label: "Attendance", icon: time, iconWhite: timeWhite, path: "/attendances" },
-    { label: "Summary", icon: time, iconWhite: timeWhite, path: "/attendancesummary" },
-    { label: "Office Location", icon: employee, iconWhite: employeeWhite, path: "/officelocation" },
+    { label: "Dashboard", icon: dashboard, iconWhite: dashboardWhite, path: "/dashboard", restricted: true },
+    { label: "Employee", icon: employee, iconWhite: employeeWhite, path: "/hr/employeemanagement", restricted: true },
+    { label: "Attendance", icon: time, iconWhite: timeWhite, path: "/attendances", restricted: true },
+    { label: "Summary", icon: time, iconWhite: timeWhite, path: "/attendancesummary", restricted: true },
+    { label: "Office Location", icon: employee, iconWhite: employeeWhite, path: "/officelocation", restricted: true },
   ];
+
+  const visibleMenuItems = menuItems.filter(item => {
+    if (userRole === "AGENT" && item.restricted) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div id="side-nav" className="!flex !flex-col !h-full !bg-[#fff]">
@@ -39,7 +50,7 @@ const SideNav: React.FC = () => {
       </div>
 
       <div className="flex flex-col flex-1 gap-[10px] px-4">
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const isActive = pathname === item.path;
           const isHovered = hoveredItem === item.label;
 

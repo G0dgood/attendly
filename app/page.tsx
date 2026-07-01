@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const router = useRouter()
-  const { isSuperAdmin, isAdmin } = useUserPrivileges();
+  const { isSuperAdmin, isAdmin, isAgent } = useUserPrivileges();
   const [password, setPassword] = React.useState<string>('');
   const [showPassword, setShowPassword] = useState<any>(false);
   const [loading, setLoading] = useState(false);
@@ -46,8 +46,10 @@ const Login = () => {
   useEffect(() => {
     if (isSuperAdmin || isAdmin) {
       router.push('/dashboard');
+    } else if (isAgent) {
+      router.push('/profile');
     }
-  }, [isSuperAdmin, isAdmin]);
+  }, [isSuperAdmin, isAdmin, isAgent]);
 
 
 

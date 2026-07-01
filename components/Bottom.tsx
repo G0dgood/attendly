@@ -3,6 +3,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { useUserPrivileges } from "@/utils/userPrivileges";
 import dashboard from "../public/DashboardIcon/darhboard.svg";
 import dashboardBlue from "../public/DashboardIcon/dashboardBlue.svg";
 import employee from "../public/DashboardIcon/employee.svg";
@@ -13,24 +14,30 @@ import timeBlue from "../public/DashboardIcon/timeBlue.svg";
 
 const Footer = () => {
 	const pathname = usePathname();
+	const { user } = useUserPrivileges();
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
+	const userRole = user?.role?.toUpperCase();
+
 	const navItems = [
-		// { label: "Dashboard", icon: dashboard, iconWhite: dashboardBlue, path: "/dashboard" },
-		// { label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/employee" },
-		// { label: "Attendance", icon: time, iconWhite: timeBlue, path: "/employeeattendance" },
-		{ label: "Dashboard", icon: dashboard, iconWhite: dashboardBlue, path: "/dashboard" },
-		{ label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/hr/employeemanagement" },
-		{ label: "Attendance", icon: time, iconWhite: timeBlue, path: "/attendances" },
-		{ label: "Summary", icon: time, iconWhite: timeBlue, path: "/attendancesummary" },
-		{ label: "Office", icon: employee, iconWhite: timeBlue, path: "/officelocation" },
+		{ label: "Dashboard", icon: dashboard, iconWhite: dashboardBlue, path: "/dashboard", restricted: true },
+		{ label: "Employee", icon: employee, iconWhite: employeeBlue, path: "/hr/employeemanagement", restricted: true },
+		{ label: "Attendance", icon: time, iconWhite: timeBlue, path: "/attendances", restricted: true },
+		{ label: "Summary", icon: time, iconWhite: timeBlue, path: "/attendancesummary", restricted: true },
+		{ label: "Office", icon: employee, iconWhite: timeBlue, path: "/officelocation", restricted: true },
 	];
 
+	const visibleNavItems = navItems.filter(item => {
+		if (userRole === "AGENT" && item.restricted) {
+			return false;
+		}
+		return true;
+	});
 
 	return (
 		<div id="footer" className="!flex !justify-between !items-center">
 			<div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-[64px] shadow-[0_0_10px_rgba(0,0,0,0.1)]">
-				{navItems.map((item) => {
+				{visibleNavItems.map((item) => {
 					const isActive = pathname.startsWith(item.path);
 					const isHovered = hoveredItem === item.label;
 

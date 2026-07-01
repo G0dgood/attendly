@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { useSession } from "next-auth/react";
+import { useUserPrivileges } from "@/utils/userPrivileges";
 import PageHeader from "@/components/PageHeader";
 import Input from "@/components/Input";
 import Dropdowns from "@/components/CustomDropdown";
@@ -15,8 +15,8 @@ import {
 } from "@/utils/APISlice/userApi";
 
 const ProfileContent = () => {
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
+  const { user } = useUserPrivileges();
+  const userId = user?.id;
   const [activeTab, setActiveTab] = useState("info");
 
   // RTK Query endpoints
@@ -45,20 +45,41 @@ const ProfileContent = () => {
   // Populate profile info from fetched API user details
   useEffect(() => {
     if (userData) {
-      const user = userData.data?.user || userData.data?.data || userData.data || userData;
+      const u = userData.data?.user || userData.data?.data || userData.data || userData;
       setProfileInput({
-        name: user?.name || user?.fullName || "",
-        phone: user?.phone || "",
-        gender: user?.gender || "",
+        name: u?.name || u?.fullName || "",
+        phone: u?.phone || "",
+        gender: u?.gender || "",
       });
-    } else if (session?.user) {
-      setProfileInput({
-        name: session.user.fullName || "",
-        phone: session.user.phone || "",
-        gender: "",
-      });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("attendly_user_profile", JSON.stringify(u));
+      }
+    } else {
+      if (typeof window !== "undefined") {
+        const storedProfile = localStorage.getItem("attendly_user_profile");
+        if (storedProfile) {
+          try {
+            const u = JSON.parse(storedProfile);
+            setProfileInput({
+              name: u?.name || u?.fullName || "",
+              phone: u?.phone || "",
+              gender: u?.gender || "",
+            });
+            return;
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      if (user) {
+        setProfileInput({
+          name: user.fullName || "",
+          phone: user.phone || "",
+          gender: "",
+        });
+      }
     }
-  }, [userData, session]);
+  }, [userData, user]);
 
   const handleProfileChange = (field: string, value: string) => {
     setProfileInput((prev) => ({ ...prev, [field]: value }));
@@ -196,7 +217,7 @@ const ProfileContent = () => {
                 </div>
 
                 <Input
-                  value={session?.user?.email || ""}
+                  value={user?.email || ""}
                   handleOnChange={() => { }}
                   label="Email Address (Read Only)"
                   placeholder=""

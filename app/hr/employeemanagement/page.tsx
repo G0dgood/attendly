@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
+import moment from "moment";
 
 interface User {
 	id: string;
@@ -22,6 +23,7 @@ interface User {
 	isActive?: string;
 	role?: string;
 	email?: string;
+	createdAt?: string;
 }
 
 import { useGetUsersParamsQuery, useGetUsersQuery } from '@/utils/APISlice/userApi';
@@ -33,6 +35,17 @@ const EmployeeDashBoard = () => {
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
 	const [filterByDate, setFilterByDate] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
+	const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearchQuery(searchQuery);
+			setCurrentPage(1);
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [searchQuery]);
 
 	// RTK Query hooks
 	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersParamsQuery({
@@ -40,7 +53,8 @@ const EmployeeDashBoard = () => {
 		limit,
 		filterByDate,
 		startDate,
-		endDate
+		endDate,
+		search: debouncedSearchQuery
 	});
 	const { data: attendanceData } = useGetAttendanceQuery();
 	const [addAttendanceManual, { isLoading: isLoadingAttendance, isSuccess: successAttendance, error: errorAttendance }] = useAddAttendanceManualMutation();
@@ -135,7 +149,11 @@ const EmployeeDashBoard = () => {
 			<PageHeader text="Employee" />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6 '>
-				<Search />
+				<Search
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					placeholder="Search employees..."
+				/>
 				<div className='flex flex-col md:flex-row gap-5 relative'>
 					<button
 						onClick={() => setIsUploadOpen(true)}
@@ -194,14 +212,15 @@ const EmployeeDashBoard = () => {
 								<th>Attendance</th>
 								<th>Designation</th>
 								<th>Email address</th>
+								<th>Created At</th>
 								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
 							{isLoadingUsers ? (
-								<SVGLoaderFetch colSpan={9} />
+								<SVGLoaderFetch colSpan={10} />
 							) : dataToRender?.length === 0 ? (
-								<NoRecordFound colSpan={9}>No employee records found!</NoRecordFound>
+								<NoRecordFound colSpan={10}>No employee records found!</NoRecordFound>
 							) : (
 								dataToRender.map((user: any) => {
 									const status = getUserStatus(user.id);
@@ -249,6 +268,9 @@ const EmployeeDashBoard = () => {
 											</td>
 											<td>{user?.role || 'N/A'}</td>
 											<td>{user?.email}</td>
+											<td className="whitespace-nowrap">
+												{user?.createdAt ? moment(user.createdAt).format("YYYY-MM-DD HH:mm") : "—"}
+											</td>
 											<td>
 												<div className="flex flex-row gap-[20px]">
 													{/* <button className="cursor-pointer">

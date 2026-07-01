@@ -15,6 +15,7 @@ export const userApi = baseApi.injectEndpoints({
           filterByDate: params.filterByDate,
           startDate: params.startDate,
           endDate: params.endDate,
+          search: params.search,
         },
       }),
       providesTags: ['User'],

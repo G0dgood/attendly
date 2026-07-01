@@ -1,22 +1,22 @@
 
 "use client";
 import Image from "next/image";
-import { useSession, signOut } from "next-auth/react";
+import { useUserPrivileges } from "@/utils/userPrivileges";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const Header = () => {
-  const { data: session } = useSession();
+  const { user } = useUserPrivileges();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
 
 
   const userInitials =
-    session?.user?.email
+    user?.email
       ?.split("@")[0]
       ?.split(" ")
-      .map((n) => n[0]?.toUpperCase())
+      .map((n: string) => n[0]?.toUpperCase())
       .join("") || "U";
 
   return (
@@ -36,10 +36,10 @@ const Header = () => {
 
           <div>
             <h3 className="font-medium text-[14px] leading-[150%] text-[#3A4050]">
-              {session?.user?.fullName || "??"}
+            {user?.fullName || "??"}
             </h3>
             <p className="font-normal text-[12px] leading-[150%] text-[#3A4050]">
-              {session?.user?.role || "??"}
+              {user?.role || "??"}
             </p>
           </div>
         </div>
@@ -52,7 +52,7 @@ const Header = () => {
               <div>
                 <p className="text-sm text-gray-700 mb-0.5">Signed in as</p>
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {session?.user?.email || ""}
+                  {user?.email || ""}
                 </p>
               </div>
               <hr className="border-gray-100 my-1" />
@@ -67,9 +67,14 @@ const Header = () => {
               </button>
               <button
                 onClick={async () => {
+                  if (typeof window !== "undefined") {
+                    localStorage.removeItem("attendly_user");
+                    localStorage.removeItem("attendly_user_profile");
+                  }
+                  const { signOut } = await import("next-auth/react");
                   await signOut({
                     callbackUrl: "/",
-                  })
+                  });
                 }}
                 className="w-full px-4 py-2 text-sm text-white !bg-[#2563EB]   hover:bg-blue-700 rounded-none text-center cursor-pointer font-medium"
               >
