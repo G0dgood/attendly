@@ -38,7 +38,7 @@ const Login = () => {
       toast.success("Login successful!");
       router.push('/dashboard');
     } else {
-      const errMsg = res?.error && res.error !== "CredentialsSignin" ? res.error : "Invalid email or password";
+      const errMsg = res?.error && res.error !== "CredentialsSignin" ? res.error : "Network Error";
       toast.error(errMsg);
     }
   };
