@@ -15,16 +15,79 @@ import { useRouter } from 'next/navigation';
 
 
 
-import { useGetAttendanceQuery } from '@/utils/APISlice/attendanceApi';
+import { useGetAttendanceSummaryQuery } from '@/utils/APISlice/attendanceApi';
 import { useGetUsersQuery, useCreateQrTokenMutation } from '@/utils/APISlice/userApi';
 import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
 
 const EmployeeDashBoard = () => {
 	const router = useRouter();
 	const { user } = useUserPrivileges();
+	const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
+
+	// Date filter functions
+	const getDateRange = (filter: string) => {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		const formatLocalDate = (date: Date) => {
+			return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+		};
+
+		switch (filter) {
+			case "Today":
+				const todayEnd = new Date(today);
+				todayEnd.setHours(23, 59, 59, 999);
+				return {
+					start: formatLocalDate(today),
+					end: formatLocalDate(todayEnd),
+					label: "Today"
+				};
+			case "Yesterday":
+				const yesterday = new Date(today);
+				yesterday.setDate(yesterday.getDate() - 1);
+				const yesterdayEnd = new Date(yesterday);
+				yesterdayEnd.setHours(23, 59, 59, 999);
+				return {
+					start: formatLocalDate(yesterday),
+					end: formatLocalDate(yesterdayEnd),
+					label: "Yesterday"
+				};
+			case "Last Week":
+				const lastWeekStart = new Date(today);
+				lastWeekStart.setDate(today.getDate() - 7);
+				return {
+					start: formatLocalDate(lastWeekStart),
+					end: formatLocalDate(today),
+					label: "Last Week"
+				};
+			case "Last Month":
+				const lastMonthStart = new Date(today);
+				lastMonthStart.setMonth(today.getMonth() - 1);
+				return {
+					start: formatLocalDate(lastMonthStart),
+					end: formatLocalDate(today),
+					label: "Last Month"
+				};
+			default:
+				return {
+					start: formatLocalDate(today),
+					end: formatLocalDate(today),
+					label: "Today"
+				};
+		}
+	};
 
 	// RTK Query hooks
-	const { data: attendanceData, isLoading: isLoadingAttendance } = useGetAttendanceQuery();
+	const { data: summaryData, isLoading: isLoadingAttendance } = useGetAttendanceSummaryQuery({
+		id: user?.officeId || '',
+		params: {
+			page: 1,
+			limit: 1000,
+			filterByDate: selectedDateFilter,
+			startDate: getDateRange(selectedDateFilter).start,
+			endDate: getDateRange(selectedDateFilter).end,
+		}
+	}, { skip: !user?.officeId });
 	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersQuery();
 	const { data: officeData, isLoading: isLoadingOffice } = useGetOfficeLocationsQuery();
 	const [createQrToken, { isLoading: isLoadingQR }] = useCreateQrTokenMutation();
@@ -33,7 +96,6 @@ const EmployeeDashBoard = () => {
 		officeId: "",
 		type: ""
 	});
-	const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
 	const [dataQR, setDataQR] = useState<any>(null);
 
 	useEffect(() => {
@@ -56,10 +118,17 @@ const EmployeeDashBoard = () => {
 
 	// Extract data from RTK Query responses
 	const users = usersData?.data?.users || usersData?.data?.data?.data || usersData?.data?.data || usersData?.data || [];
-	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
+	const summaryRecords = summaryData?.data?.data?.data || summaryData?.data?.data || summaryData?.data || [];
 
 	const employee = Array.isArray(users) ? [...users] : [];
-	const attendanceRecord = Array.isArray(attendanceRecords) ? [...attendanceRecords] : [];
+	const attendanceRecord = Array.isArray(summaryRecords)
+		? summaryRecords.flatMap((record: any) => {
+			return (record?.attendance || []).map((att: any) => ({
+				...att,
+				userId: att.userId || record.id || record.userId,
+			}));
+		})
+		: [];
 
 	const handleOnChange = (input: string, value: string) => {
 		setInputs((prevState) => ({
@@ -80,55 +149,6 @@ const EmployeeDashBoard = () => {
 
 	const handleSubmits = () => {
 		// getCalender logic will be updated later if needed
-	}
-
-	// Date filter functions
-	const getDateRange = (filter: string) => {
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-
-		switch (filter) {
-			case "Today":
-				const todayEnd = new Date(today);
-				todayEnd.setHours(23, 59, 59, 999);
-				return {
-					start: today.toISOString().split('T')[0],
-					end: todayEnd.toISOString().split('T')[0],
-					label: "Today"
-				};
-			case "Yesterday":
-				const yesterday = new Date(today);
-				yesterday.setDate(yesterday.getDate() - 1);
-				const yesterdayEnd = new Date(yesterday);
-				yesterdayEnd.setHours(23, 59, 59, 999);
-				return {
-					start: yesterday.toISOString().split('T')[0],
-					end: yesterdayEnd.toISOString().split('T')[0],
-					label: "Yesterday"
-				};
-			case "Last Week":
-				const lastWeekStart = new Date(today);
-				lastWeekStart.setDate(today.getDate() - 7);
-				return {
-					start: lastWeekStart.toISOString().split('T')[0],
-					end: today.toISOString().split('T')[0],
-					label: "Last Week"
-				};
-			case "Last Month":
-				const lastMonthStart = new Date(today);
-				lastMonthStart.setMonth(today.getMonth() - 1);
-				return {
-					start: lastMonthStart.toISOString().split('T')[0],
-					end: today.toISOString().split('T')[0],
-					label: "Last Month"
-				};
-			default:
-				return {
-					start: today.toISOString().split('T')[0],
-					end: today.toISOString().split('T')[0],
-					label: "Today"
-				};
-		}
 	};
 
 	const handleDateFilter = (filter: string) => {

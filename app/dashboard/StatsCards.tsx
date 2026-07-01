@@ -7,6 +7,10 @@ const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) =>
 		? [...attendanceRecords] 
 		: (attendanceRecords?.data?.data || attendanceRecords?.data || []);
 
+	const formatLocalDate = (date: Date) => {
+		return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+	};
+
 	// Filter CHECK_IN records based on selected date range
 	const checkInRecords = dataToRender
 		.filter((record: any) => {
@@ -16,8 +20,8 @@ const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) =>
 			const recordDate = new Date(record.timestamp);
 			if (isNaN(recordDate.getTime())) return false;
 
-			// Get date in YYYY-MM-DD format for comparison
-			const recordDateStr = recordDate.toISOString().split('T')[0];
+			// Get date in YYYY-MM-DD format in local timezone for comparison
+			const recordDateStr = formatLocalDate(recordDate);
 			
 			// Filter based on date range
 			if (dateRange) {
@@ -26,7 +30,7 @@ const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) =>
 			}
 			
 			// Fallback to today if no date range provided
-			const today = new Date().toISOString().split("T")[0];
+			const today = formatLocalDate(new Date());
 			return recordDateStr === today;
 		})
 		.reduce((acc: any, curr: any) => {
@@ -49,12 +53,13 @@ const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) =>
 	let earlyArrivals = 0;
 
 	checkIns.forEach((record: any) => {
-		const localDate = new Date(new Date(record?.timestamp).getTime() - new Date().getTimezoneOffset() * 60000);
+		const localDate = new Date(record?.timestamp);
 		const timeInMinutes = localDate.getHours() * 60 + localDate.getMinutes();
 
 		presentToday++;
 
-		if (timeInMinutes < 480) {
+		// 8:00 AM starts shift (480 minutes). Up to 8:00 AM is Early, after is Late.
+		if (timeInMinutes <= 480) {
 			earlyArrivals++;
 		} else {
 			lateArrivals++;
