@@ -8,10 +8,12 @@ import PageHeader from '@/components/PageHeader';
 import { useRouter } from 'next/navigation';
 import AddEmployeeModal from '@/components/modals/AddEmployeeModal';
 import ManualClockInModal from '@/components/modals/ManualClockInModal';
+import UploadUsersModal from '@/components/modals/UploadUsersModal';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import RealPagination from '@/components/RealPagination';
 import FilterDropdown from '@/components/FilterDropdown';
+import moment from "moment";
 
 interface User {
 	id: string;
@@ -21,6 +23,7 @@ interface User {
 	isActive?: string;
 	role?: string;
 	email?: string;
+	createdAt?: string;
 }
 
 import { useGetUsersParamsQuery, useGetUsersQuery } from '@/utils/APISlice/userApi';
@@ -32,6 +35,17 @@ const EmployeeDashBoard = () => {
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
 	const [filterByDate, setFilterByDate] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
+	const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearchQuery(searchQuery);
+			setCurrentPage(1);
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [searchQuery]);
 
 	// RTK Query hooks
 	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersParamsQuery({
@@ -39,7 +53,8 @@ const EmployeeDashBoard = () => {
 		limit,
 		filterByDate,
 		startDate,
-		endDate
+		endDate,
+		search: debouncedSearchQuery
 	});
 	const { data: attendanceData } = useGetAttendanceQuery();
 	const [addAttendanceManual, { isLoading: isLoadingAttendance, isSuccess: successAttendance, error: errorAttendance }] = useAddAttendanceManualMutation();
@@ -48,6 +63,7 @@ const EmployeeDashBoard = () => {
 	const router = useRouter();
 	const [dropFilter, setDropFilter] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [isUploadOpen, setIsUploadOpen] = useState(false);
 	const [input, setInput] = useState({
 		token: '',
 		userId: '',
@@ -133,8 +149,18 @@ const EmployeeDashBoard = () => {
 			<PageHeader text="Employee" />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6 '>
-				<Search />
+				<Search
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					placeholder="Search employees..."
+				/>
 				<div className='flex flex-col md:flex-row gap-5 relative'>
+					<button
+						onClick={() => setIsUploadOpen(true)}
+						className="cursor-pointer flex flex-col md:flex-row justify-center items-center gap-2 px-4 h-[40px] border border-[#2563EB] !bg-white hover:!bg-gray-50 font-normal text-[14px] leading-[150%] text-[#2563EB] rounded-none transition"
+					>
+						Bulk Upload
+					</button>
 					<button
 						onClick={() => setIsOpen(true)}
 						className="cursor-pointer flex flex-col md:flex-row justify-center items-center gap-2 md:w-[150px] h-[40px] !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
@@ -186,14 +212,15 @@ const EmployeeDashBoard = () => {
 								<th>Attendance</th>
 								<th>Designation</th>
 								<th>Email address</th>
+								<th>Created At</th>
 								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
 							{isLoadingUsers ? (
-								<SVGLoaderFetch colSpan={9} />
+								<SVGLoaderFetch colSpan={10} />
 							) : dataToRender?.length === 0 ? (
-								<NoRecordFound colSpan={9}>No employee records found!</NoRecordFound>
+								<NoRecordFound colSpan={10}>No employee records found!</NoRecordFound>
 							) : (
 								dataToRender.map((user: any) => {
 									const status = getUserStatus(user.id);
@@ -241,6 +268,9 @@ const EmployeeDashBoard = () => {
 											</td>
 											<td>{user?.role || 'N/A'}</td>
 											<td>{user?.email}</td>
+											<td className="whitespace-nowrap">
+												{user?.createdAt ? moment(user.createdAt).format("YYYY-MM-DD HH:mm") : "—"}
+											</td>
 											<td>
 												<div className="flex flex-row gap-[20px]">
 													{/* <button className="cursor-pointer">
@@ -284,6 +314,7 @@ const EmployeeDashBoard = () => {
 			/>
 
 			<AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />
+			<UploadUsersModal isOpen={isUploadOpen} setIsOpen={setIsUploadOpen} />
 		</div>
 	);
 };

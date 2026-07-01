@@ -69,11 +69,11 @@ export const authOptions: AuthOptions = {
               officeId: user.officeId
             };
           }
-
           return null;
-        } catch (err) {
+        } catch (err: any) {
           console.error("Authorize error:", err);
-          return null;
+          const message = err?.response?.data?.message || err?.message || "Invalid email or password";
+          throw new Error(message);
         }
       },
     }),

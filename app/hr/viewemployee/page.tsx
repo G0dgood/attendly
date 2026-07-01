@@ -3,7 +3,7 @@ import React, { useState, Suspense } from 'react'
 import Image from "next/image";
 import PageHeader from '@/components/PageHeader';
 import PersonalInformationView from './PersonalInformationView';
-import { useSession } from 'next-auth/react';
+import { useUserPrivileges } from '@/utils/userPrivileges';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useGetUserByIdQuery } from '@/utils/APISlice/userApi';
 import { SVGLoader } from '@/components/SVGLoader';
@@ -12,7 +12,7 @@ import EditEmployeeModal from '@/components/modals/EditEmployeeModal';
 const ViewEmployeeContent = () => {
 	const [activeTabs, setActiveTabs] = useState(1);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const { data: session } = useSession();
+	const { user } = useUserPrivileges();
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const employeeId = searchParams.get('id');
@@ -33,7 +33,7 @@ const ViewEmployeeContent = () => {
 
 	const displayUser = employeeId
 		? (employeeData?.data?.user || employeeData?.data?.data || employeeData?.data || employeeData)
-		: session?.user;
+		: user;
 
 	// In case there is no user loaded and no session
 	if (!displayUser) {

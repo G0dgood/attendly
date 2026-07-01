@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react'
 import PageHeader from '@/components/PageHeader'
-import { useSession } from 'next-auth/react';
+import { useUserPrivileges } from '@/utils/userPrivileges';
 import StatsCards from './StatsCards';
 import CustomDateDropdown from '@/components/CustomDateDropdown';
 import AttendanceList from './component/AttendanceList';
@@ -21,7 +21,7 @@ import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
 
 const EmployeeDashBoard = () => {
 	const router = useRouter();
-	const { data: session }: any = useSession();
+	const { user } = useUserPrivileges();
 
 	// RTK Query hooks
 	const { data: attendanceData, isLoading: isLoadingAttendance } = useGetAttendanceQuery();
@@ -36,17 +36,23 @@ const EmployeeDashBoard = () => {
 	const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
 	const [dataQR, setDataQR] = useState<any>(null);
 
+	useEffect(() => {
+		if (user?.role?.toUpperCase() === "AGENT") {
+			router.push('/profile');
+		}
+	}, [user, router]);
+
 	// Fetch calender data when filter changes (this will be refactored to use lazy query if needed, 
 	// but for now we'll stick to basic implementation)
 
 	useEffect(() => {
-		if (session?.user?.officeId) {
+		if (user?.officeId) {
 			setInputs(prev => ({
 				...prev,
-				officeId: session.user.officeId,
+				officeId: user.officeId,
 			}));
 		}
-	}, [session?.user?.officeId]);
+	}, [user?.officeId]);
 
 	// Extract data from RTK Query responses
 	const users = usersData?.data?.users || usersData?.data?.data?.data || usersData?.data?.data || usersData?.data || [];
