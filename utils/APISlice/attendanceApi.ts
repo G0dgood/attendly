@@ -15,19 +15,21 @@ export const attendanceApi = baseApi.injectEndpoints({
           filterByDate: params.filterByDate,
           startDate: params.startDate,
           endDate: params.endDate,
+          search: params.search,
         },
       }),
       providesTags: ['Attendance'],
     }),
-    getAttendanceSummary: builder.query<any, { id: string; params: any }>({
+    getAttendanceSummary: builder.query<any, { id?: string; params: any }>({
       query: ({ id, params }) => ({
-        url: `/attendance/summary/${id}`,
+        url: id ? `/attendance/summary/${id}` : '/attendance/summary',
         params: {
           page: params.page,
           limit: params.limit,
           filterByDate: params.filterByDate,
           startDate: params.startDate,
           endDate: params.endDate,
+          search: params.search,
         },
       }),
     }),
