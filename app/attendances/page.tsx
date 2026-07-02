@@ -19,6 +19,19 @@ const Attendance = () => {
 	const [limit, setLimit] = useState(10);
 	const [filterByDate, setFilterByDate] = useState("");
 	const [result, setResult] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
+	const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearchQuery(searchQuery);
+		}, 500);
+		return () => clearTimeout(timer);
+	}, [searchQuery]);
+
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [debouncedSearchQuery]);
 
 	// RTK Query hook
 	const { data: attendanceData, isLoading: loadingAttendanceParams } = useGetAttendanceParamsQuery({
@@ -27,6 +40,7 @@ const Attendance = () => {
 		filterByDate,
 		startDate,
 		endDate,
+		search: debouncedSearchQuery,
 	});
 
 	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
@@ -122,7 +136,11 @@ const Attendance = () => {
 			<PageHeader text={"Attendance"} />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6'>
-				<Search />
+				<Search
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					placeholder="Search employees..."
+				/>
 
 				<div className='flex flex-col md:flex-row gap-5 relative'>
 					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
