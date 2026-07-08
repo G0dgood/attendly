@@ -8,6 +8,7 @@ import { signIn } from "next-auth/react";
 import { useUserPrivileges } from "@/utils/userPrivileges";
 import { SVGLoader } from "@/components/SVGLoader";
 import { toast } from "sonner";
+import Link from "next/link";
 
 
 
@@ -54,7 +55,7 @@ const Login = () => {
 
 
   return (
-    <div id="login-wrapper">
+    <div id="login-wrapper" className="relative">
       <div className='img_licence-containers_login'>
         <div className="w-full flex">
           <div className="flex items-center gap-2 font-semibold text-gray-900 ">
@@ -113,6 +114,14 @@ const Login = () => {
         </form>
       </div>
       <div className="forgot_your_pass cursor-pointer"></div>
+      <div className="absolute bottom-4 right-4 z-10">
+        <Link
+          href="/privacy"
+          className="text-xs text-gray-500 hover:text-[#2563EB] hover:underline transition-colors duration-200"
+        >
+          Privacy Policy
+        </Link>
+      </div>
     </div>
   );
 };
