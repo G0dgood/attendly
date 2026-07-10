@@ -11,6 +11,7 @@ import { useGetAttendanceParamsQuery } from '@/utils/APISlice/attendanceApi';
 import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
 import CustomDropdownOffice from '@/components/CustomDropdownOffice';
 import { useUserPrivileges } from '@/utils/userPrivileges';
+import moment from "moment";
 
 const Attendance = () => {
 	const { user, isSuperAdmin } = useUserPrivileges();
@@ -212,6 +213,7 @@ const Attendance = () => {
 							<tr>
 								<th>Employee Name</th>
 								<th>Email</th>
+								<th>Day</th>
 								<th>Check In</th>
 								<th>Check Out</th>
 								<th>Total Hour</th>
@@ -220,9 +222,9 @@ const Attendance = () => {
 						</thead>
 						<tbody>
 							{loadingAttendanceParams ? (
-								<SVGLoaderFetch colSpan={6} />
+								<SVGLoaderFetch colSpan={7} />
 							) : dataToRender?.length === 0 ? (
-								<NoRecordFound colSpan={6} />
+								<NoRecordFound colSpan={7} />
 							) : (
 								dataToRender?.map((record: any) => {
 									const checkIn = record?.clockIn
@@ -244,6 +246,7 @@ const Attendance = () => {
 									const employeeEmail = record?.user?.email || '—';
 
 									const clockInDate = record?.clockIn ? new Date(record?.clockIn) : null;
+									const day = clockInDate ? moment(clockInDate).format('dddd') : '—';
 									const isEarly = clockInDate && (clockInDate.getHours() < 8 || (clockInDate.getHours() === 8 && clockInDate.getMinutes() === 0));
 									const status = clockInDate ? (isEarly ? 'Early' : 'Late') : 'Absent';
 
@@ -251,6 +254,7 @@ const Attendance = () => {
 										<tr key={record?.id}>
 											<td className='whitespace-nowrap'>{employeeName}</td>
 											<td>{employeeEmail}</td>
+											<td>{day}</td>
 											<td>{checkIn}</td>
 											<td>{checkOut}</td>
 											<td>{totalHour}</td>

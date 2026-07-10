@@ -238,6 +238,7 @@ const EmployeeDashBoard = () => {
 								<th>Phone</th>
 								<th>Status</th>
 								<th>Attendance</th>
+								<th>Shift</th>
 								<th>Designation</th>
 								<th>Email address</th>
 								<th>Created At</th>
@@ -246,9 +247,9 @@ const EmployeeDashBoard = () => {
 						</thead>
 						<tbody>
 							{isLoadingUsers ? (
-								<SVGLoaderFetch colSpan={10} />
+								<SVGLoaderFetch colSpan={11} />
 							) : dataToRender?.length === 0 ? (
-								<NoRecordFound colSpan={10}>No employee records found!</NoRecordFound>
+								<NoRecordFound colSpan={11}>No employee records found!</NoRecordFound>
 							) : (
 								dataToRender.map((user: any) => {
 									const status = getUserStatus(user.id);
@@ -300,6 +301,9 @@ const EmployeeDashBoard = () => {
 												>
 													{status}
 												</div>
+											</td>
+											<td>
+												{user?.shift ? `${user.shift.name} (${user.shift.startTime} - ${user.shift.endTime})` : 'Not Assigned'}
 											</td>
 											<td>{user?.role || 'N/A'}</td>
 											<td>{user?.email}</td>
