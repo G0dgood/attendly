@@ -235,11 +235,20 @@ const EditEmployeeModal = ({ isOpen, setIsOpen, user }: EditEmployeeModalProps) 
 								/>
 
 								<Dropdowns
-									label={inputs.isActive === "active" ? "Active" : "Inactive"}
-									options={["Active", "Inactive"]}
+									label={
+										inputs.isActive === "active" 
+											? "Active" 
+											: inputs.isActive === "resigned" 
+											? "Resigned" 
+											: "Inactive"
+									}
+									options={["Active", "Inactive", "Resigned"]}
 									name="isActive"
 									handleOnChange={(name, value) => {
-										handleOnChange("isActive", value === "Active" ? "active" : "inactive");
+										let val = "active";
+										if (value === "Inactive") val = "deactivated";
+										else if (value === "Resigned") val = "resigned";
+										handleOnChange("isActive", val);
 									}}
 									islabelone="Status"
 								/>

@@ -279,12 +279,19 @@ const EmployeeDashBoard = () => {
 											<td >{user?.phone}</td>
 											<td >
 												<div
-													className={`flex flex-row justify-center items-center px-[6px] py-[4px] w-[46px] h-[22px] border font-medium text-[12px] leading-[18px] ${user?.isActive === 'active'
-														? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
-														: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
-														}`}
+													className={`flex flex-row justify-center items-center px-[6px] py-[4px] w-[65px] h-[22px] border font-medium text-[11px] leading-[18px] ${
+														user?.isActive === 'active'
+															? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
+															: user?.isActive === 'resigned'
+															? 'bg-[#EFF6FF] border-[#BFDBFE] text-[#1D4ED8]'
+															: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
+													}`}
 												>
-													{user?.isActive === 'active' ? 'Active' : 'Inactive'}
+													{user?.isActive === 'active' 
+														? 'Active' 
+														: user?.isActive === 'resigned' 
+														? 'Resigned' 
+														: 'Inactive'}
 												</div>
 											</td>
 											<td data-title="Attendance">
