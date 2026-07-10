@@ -128,6 +128,7 @@ const Attendance = () => {
 											<button
 												className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
 												onClick={() => {
+													console.log('Opening ShiftModal for office.id:', office.id);
 													setSelectedOfficeId(office.id);
 													setShiftModalOpen(true);
 												}}

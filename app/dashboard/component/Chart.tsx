@@ -33,7 +33,8 @@ const Chart = ({ chartdata, dateRange }: any) => {
 			if (!record.clockIn) return false;
 			const recordDate = new Date(record.clockIn);
 			if (isNaN(recordDate.getTime())) return false;
-			const recordDateStr = recordDate.toISOString().split('T')[0];
+			// Format record date as local YYYY-MM-DD to match dateRange
+			const recordDateStr = `${recordDate.getFullYear()}-${String(recordDate.getMonth() + 1).padStart(2, '0')}-${String(recordDate.getDate()).padStart(2, '0')}`;
 			return recordDateStr >= dateRange.start && recordDateStr <= dateRange.end;
 		})
 		: chartdata.filter((record: any) => record.clockIn);

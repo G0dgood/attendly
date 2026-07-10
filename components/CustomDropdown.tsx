@@ -15,6 +15,7 @@ interface CustomDropdownProps {
 	name: string;
 	handleOnChange: (name: string, value: string) => void;
 	loading?: boolean;
+	value?: string;
 }
 
 const CustomDropdown = ({
@@ -25,10 +26,24 @@ const CustomDropdown = ({
 	name,
 	handleOnChange,
 	loading = false,
+	value,
 }: CustomDropdownProps) => {
 	const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+
+	// Sync selectedLabel with value prop
+	useEffect(() => {
+		if (value) {
+			// Find the option that matches value
+			const option = options.find(opt =>
+				(typeof opt === "string" ? opt === value : opt.id === value)
+			);
+			if (option) {
+				setSelectedLabel(typeof option === "string" ? option : option.name);
+			}
+		}
+	}, [value, options]);
 
 	const toggleDropdown = () => {
 		if (!loading) setIsOpen(!isOpen);
@@ -105,6 +120,7 @@ interface DropdownsProps {
 	name: string;
 	handleOnChange: (name: string, value: string) => void;
 	loading?: boolean;
+	value?: string;
 }
 
 const Dropdowns = ({
@@ -115,6 +131,7 @@ const Dropdowns = ({
 	name,
 	handleOnChange,
 	loading,
+	value,
 }: DropdownsProps) => {
 	return (
 		<CustomDropdown
@@ -125,6 +142,7 @@ const Dropdowns = ({
 			name={name}
 			handleOnChange={handleOnChange}
 			loading={loading}
+			value={value}
 		/>
 	);
 };
