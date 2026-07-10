@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) => {
-	const totalEmployees = users?.length || 0;
+const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange, stats }: any) => {
+	const totalEmployees = stats ? stats.totalEmployees : (users?.length || 0);
 
 	const dataToRender = Array.isArray(attendanceRecords) 
 		? [...attendanceRecords] 
@@ -49,24 +49,26 @@ const StatsCards = ({ attendanceRecords, users, dateFilter, dateRange }: any) =>
 
 	// Categorization
 	let presentToday = 0;
-	let lateArrivals = 0;
-	let earlyArrivals = 0;
+	let lateArrivals = stats ? stats.lateArrivals : 0;
+	let earlyArrivals = stats ? stats.earlyArrivals : 0;
 
-	checkIns.forEach((record: any) => {
-		const localDate = new Date(record?.timestamp);
-		const timeInMinutes = localDate.getHours() * 60 + localDate.getMinutes();
+	if (!stats) {
+		checkIns.forEach((record: any) => {
+			const localDate = new Date(record?.timestamp);
+			const timeInMinutes = localDate.getHours() * 60 + localDate.getMinutes();
 
-		presentToday++;
+			presentToday++;
 
-		// 8:00 AM starts shift (480 minutes). Up to 8:00 AM is Early, after is Late.
-		if (timeInMinutes <= 480) {
-			earlyArrivals++;
-		} else {
-			lateArrivals++;
-		}
-	});
+			// 8:00 AM starts shift (480 minutes). Up to 8:00 AM is Early, after is Late.
+			if (timeInMinutes <= 480) {
+				earlyArrivals++;
+			} else {
+				lateArrivals++;
+			}
+		});
+	}
 
-	const absentToday = totalEmployees - checkIns.length;
+	const absentToday = stats ? stats.absentToday : (totalEmployees - checkIns.length);
 
 	const statsData = [
 		{

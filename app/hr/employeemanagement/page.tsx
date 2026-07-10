@@ -28,8 +28,13 @@ interface User {
 
 import { useGetUsersParamsQuery, useGetUsersQuery } from '@/utils/APISlice/userApi';
 import { useAddAttendanceManualMutation, useGetAttendanceQuery } from '@/utils/APISlice/attendanceApi';
+import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
+import CustomDropdownOffice from '@/components/CustomDropdownOffice';
+import { useUserPrivileges } from '@/utils/userPrivileges';
 
 const EmployeeDashBoard = () => {
+	const { user, isSuperAdmin } = useUserPrivileges();
+	const [selectedOfficeId, setSelectedOfficeId] = useState("");
 	const [currentPage, setCurrentPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [startDate, setStartDate] = useState("");
@@ -48,17 +53,20 @@ const EmployeeDashBoard = () => {
 	}, [searchQuery]);
 
 	// RTK Query hooks
+	const { data: officeData, isLoading: isLoadingOffice } = useGetOfficeLocationsQuery();
 	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersParamsQuery({
 		page: currentPage,
 		limit,
 		filterByDate,
 		startDate,
 		endDate,
-		search: debouncedSearchQuery
+		search: debouncedSearchQuery,
+		officeId: isSuperAdmin ? selectedOfficeId : (user?.officeId || "")
 	});
 	const { data: attendanceData } = useGetAttendanceQuery();
 	const [addAttendanceManual, { isLoading: isLoadingAttendance, isSuccess: successAttendance, error: errorAttendance }] = useAddAttendanceManualMutation();
 	const { data: qrData } = useGetUsersQuery(); // Or wherever the QR token comes from, let's check dashboard
+	const locationOptions = officeData?.data?.data || officeData?.data || officeData || [];
 
 	const router = useRouter();
 	const [dropFilter, setDropFilter] = useState(false);
@@ -96,9 +104,13 @@ const EmployeeDashBoard = () => {
 
 	const confirmManualClockIn = () => {
 		if (selectedUser) {
-			// This needs a valid token and officeId. Usually these come from a generated QR or session
-			// For manual clock in, we might need a separate mutation or a way to get the current active token
-			toast.error("Manual clock-in requires an active QR token. Please generate one from the dashboard.");
+			const status = getUserStatus(selectedUser.id);
+			const type = status === 'Absent' ? 'CHECK_IN' : 'CHECK_OUT';
+			addAttendanceManual({
+				userId: selectedUser.id,
+				type,
+				officeId: (selectedUser as any).officeId,
+			});
 		}
 	};
 
@@ -149,11 +161,27 @@ const EmployeeDashBoard = () => {
 			<PageHeader text="Employee" />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6 '>
-				<Search
-					value={searchQuery}
-					onChange={(e) => setSearchQuery(e.target.value)}
-					placeholder="Search employees..."
-				/>
+				<div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+					<Search
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						placeholder="Search employees..."
+					/>
+					{isSuperAdmin && (
+						<div className="w-full md:w-[200px]">
+							<CustomDropdownOffice
+								label="All Locations"
+								options={[{ id: "", name: "All Locations", address: "" }, ...locationOptions]}
+								name="officeId"
+								handleOnChange={(_, value) => {
+									setSelectedOfficeId(value);
+									setCurrentPage(1);
+								}}
+								loading={isLoadingOffice}
+							/>
+						</div>
+					)}
+				</div>
 				<div className='flex flex-col md:flex-row gap-5 relative'>
 					<button
 						onClick={() => setIsUploadOpen(true)}
@@ -238,9 +266,9 @@ const EmployeeDashBoard = () => {
 												<button
 													onClick={() => handleClockInClick(user)}
 													className="cursor-pointer flex flex-row justify-center items-center px-[6px] py-[4px] w-[70px] h-[22px] border font-medium text-[12px] leading-[18px] bg-[#EFF6FF] border-[#93C5FD] text-[#1D4ED8] hover:bg-[#DBEAFE] transition"
-													title="Copy Office ID"
+													title={status === 'Absent' ? 'Clock In' : 'Clock Out'}
 												>
-													<span className="mr-1">Clock In</span>
+													<span className="mr-1">{status === 'Absent' ? 'Clock In' : 'Clock Out'}</span>
 													<svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
 														<path d="M4 4a2 2 0 012-2h6a2 2 0 012 2v2h2a2 2 0 012 2v8a2 2 0 01-2 2h-6a2 2 0 01-2-2v-2H6a2 2 0 01-2-2V4z" />
 													</svg>
@@ -311,6 +339,7 @@ const EmployeeDashBoard = () => {
 				onClose={() => setIsClockInModalOpen(false)}
 				onConfirm={confirmManualClockIn}
 				isLoadingAttendance={isLoadingAttendance}
+				type={selectedUser ? (getUserStatus(selectedUser.id) === 'Absent' ? 'CHECK_IN' : 'CHECK_OUT') : 'CHECK_IN'}
 			/>
 
 			<AddEmployeeModal isOpen={isOpen} setIsOpen={setIsOpen} />

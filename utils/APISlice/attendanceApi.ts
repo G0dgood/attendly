@@ -16,6 +16,7 @@ export const attendanceApi = baseApi.injectEndpoints({
           startDate: params.startDate,
           endDate: params.endDate,
           search: params.search,
+          officeId: params.officeId,
         },
       }),
       providesTags: ['Attendance'],
@@ -41,6 +42,16 @@ export const attendanceApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Attendance'],
     }),
+    getDashboardStats: builder.query<any, { officeId?: string; date?: string }>({
+      query: ({ officeId, date }) => ({
+        url: '/attendance/dashboard/stats',
+        params: {
+          officeId,
+          date,
+        },
+      }),
+      providesTags: ['Attendance'],
+    }),
   }),
 });
 
@@ -49,4 +60,5 @@ export const {
   useGetAttendanceParamsQuery,
   useGetAttendanceSummaryQuery,
   useAddAttendanceManualMutation,
+  useGetDashboardStatsQuery,
 } = attendanceApi;

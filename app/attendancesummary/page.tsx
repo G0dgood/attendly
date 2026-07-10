@@ -10,11 +10,15 @@ import FilterDropdown from '@/components/FilterDropdown';
 
 
 import { useGetAttendanceSummaryQuery } from '@/utils/APISlice/attendanceApi';
+import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
+import CustomDropdownOffice from '@/components/CustomDropdownOffice';
 import { useUserPrivileges } from '@/utils/userPrivileges';
 
 const AttendanceSummary = () => {
-	const { user } = useUserPrivileges();
-	const id = user?.officeId;
+	const { user, isSuperAdmin } = useUserPrivileges();
+	const [selectedOfficeId, setSelectedOfficeId] = useState("");
+	const summaryOfficeId = isSuperAdmin ? selectedOfficeId : (user?.officeId || "");
+	const shouldSkip = !user || (!isSuperAdmin && !user.officeId);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [startDate, setStartDate] = useState("");
@@ -36,9 +40,10 @@ const AttendanceSummary = () => {
 		setCurrentPage(1);
 	}, [debouncedSearchQuery]);
 
-	// RTK Query hook
+	// RTK Query hooks
+	const { data: officeData, isLoading: isLoadingOffice } = useGetOfficeLocationsQuery();
 	const { data: summaryData, isLoading: loadingAttendanceSummary } = useGetAttendanceSummaryQuery({
-		id: id || '',
+		id: summaryOfficeId,
 		params: {
 			page: currentPage,
 			limit,
@@ -47,7 +52,9 @@ const AttendanceSummary = () => {
 			endDate,
 			search: debouncedSearchQuery
 		}
-	}, { skip: !id });
+	}, { skip: shouldSkip });
+
+	const locationOptions = officeData?.data?.data || officeData?.data || officeData || [];
 
 	const attendanceSummary = summaryData?.data?.data?.data || summaryData?.data?.data || summaryData?.data || [];
 	const pagination = summaryData?.data?.data || summaryData?.data || {};
@@ -115,11 +122,27 @@ const AttendanceSummary = () => {
 			<PageHeader text={"Attendance Summary"} />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6 '>
-				<Search
-					value={searchQuery}
-					onChange={(e) => setSearchQuery(e.target.value)}
-					placeholder="Search employees..."
-				/>
+				<div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+					<Search
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						placeholder="Search employees..."
+					/>
+					{isSuperAdmin && (
+						<div className="w-full md:w-[200px]">
+							<CustomDropdownOffice
+								label="All Locations"
+								options={[{ id: "", name: "All Locations", address: "" }, ...locationOptions]}
+								name="officeId"
+								handleOnChange={(_, value) => {
+									setSelectedOfficeId(value);
+									setCurrentPage(1);
+								}}
+								loading={isLoadingOffice}
+							/>
+						</div>
+					)}
+				</div>
 
 				<div className='flex flex-col md:flex-row gap-5 relative'>
 					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">

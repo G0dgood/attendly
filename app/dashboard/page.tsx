@@ -10,12 +10,11 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import QrScanner from './component/QrScanner';
 import Dropdowns from '@/components/CustomDropdown';
+import CustomDropdownOffice from '@/components/CustomDropdownOffice';
 import { SVGLoader } from '@/components/SVGLoader';
 import { useRouter } from 'next/navigation';
 
-
-
-import { useGetAttendanceSummaryQuery } from '@/utils/APISlice/attendanceApi';
+import { useGetAttendanceSummaryQuery, useGetDashboardStatsQuery } from '@/utils/APISlice/attendanceApi';
 import { useGetUsersQuery, useCreateQrTokenMutation } from '@/utils/APISlice/userApi';
 import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
 
@@ -77,9 +76,13 @@ const EmployeeDashBoard = () => {
 		}
 	};
 
-	// RTK Query hooks
+	const isSuperAdmin = user?.role?.toUpperCase() === "SUPER_ADMIN";
+	const [selectedOfficeId, setSelectedOfficeId] = useState("");
+	const summaryOfficeId = isSuperAdmin ? selectedOfficeId : (user?.officeId || "");
+	const shouldSkip = !user || (!isSuperAdmin && !user.officeId);
+
 	const { data: summaryData, isLoading: isLoadingAttendance } = useGetAttendanceSummaryQuery({
-		id: user?.officeId || '',
+		id: summaryOfficeId,
 		params: {
 			page: 1,
 			limit: 1000,
@@ -87,9 +90,14 @@ const EmployeeDashBoard = () => {
 			startDate: getDateRange(selectedDateFilter).start,
 			endDate: getDateRange(selectedDateFilter).end,
 		}
-	}, { skip: !user?.officeId });
+	}, { skip: shouldSkip });
+	const { data: statsResponse } = useGetDashboardStatsQuery({
+		officeId: summaryOfficeId || undefined,
+		date: getDateRange(selectedDateFilter).start,
+	}, { skip: shouldSkip });
 	const { data: usersData, isLoading: isLoadingUsers } = useGetUsersQuery();
 	const { data: officeData, isLoading: isLoadingOffice } = useGetOfficeLocationsQuery();
+	const locationOptions = officeData?.data?.data || officeData?.data || officeData || [];
 	const [createQrToken, { isLoading: isLoadingQR }] = useCreateQrTokenMutation();
 
 	const [inputs, setInputs] = useState({
@@ -204,6 +212,17 @@ const EmployeeDashBoard = () => {
 							Last Month
 						</button>
 					</div>
+					{isSuperAdmin && (
+						<div className="w-full md:w-[200px]">
+							<CustomDropdownOffice
+								label="All Locations"
+								options={[{ id: "", name: "All Locations", address: "" }, ...locationOptions]}
+								name="officeId"
+								handleOnChange={(_, value) => setSelectedOfficeId(value)}
+								loading={isLoadingOffice}
+							/>
+						</div>
+					)}
 				</div>
 				<div className='flex flex-row gap-2 w-[100%]  md:w-[27%] pt-[20px] md:p-[0px]'>
 					<Dropdowns
@@ -229,6 +248,7 @@ const EmployeeDashBoard = () => {
 					users={employee}
 					dateFilter={selectedDateFilter}
 					dateRange={getDateRange(selectedDateFilter)}
+					stats={statsResponse?.data?.data}
 				/>
 				<div className='w-[100%] md:w-[30%] h-full md:h-[268px] flex flex-col gap-2'>
 					<QrScanner dataQR={dataQR} isLoadingQR={isLoadingQR} />
