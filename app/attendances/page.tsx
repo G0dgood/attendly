@@ -12,6 +12,7 @@ import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
 import CustomDropdownOffice from '@/components/CustomDropdownOffice';
 import { useUserPrivileges } from '@/utils/userPrivileges';
 import moment from "moment";
+import { getAttendanceStatus } from '@/utils/timeUtils';
 
 const Attendance = () => {
 	const { user, isSuperAdmin } = useUserPrivileges();
@@ -244,11 +245,11 @@ const Attendance = () => {
 
 									const employeeName = record?.user?.name || 'N/A';
 									const employeeEmail = record?.user?.email || '—';
+									const shiftStartTime = record?.user?.shift?.startTime;
 
 									const clockInDate = record?.clockIn ? new Date(record?.clockIn) : null;
 									const day = clockInDate ? moment(clockInDate).format('dddd') : '—';
-									const isEarly = clockInDate && (clockInDate.getHours() < 8 || (clockInDate.getHours() === 8 && clockInDate.getMinutes() === 0));
-									const status = clockInDate ? (isEarly ? 'Early' : 'Late') : 'Absent';
+									const status = clockInDate ? getAttendanceStatus(clockInDate, shiftStartTime) : 'Absent';
 
 									return (
 										<tr key={record?.id}>

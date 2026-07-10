@@ -1,5 +1,7 @@
 import { NoRecordFound, SVGLoaderFetch } from '@/components/Options';
 import { useGetAttendanceQuery } from '@/utils/APISlice/attendanceApi';
+import moment from 'moment';
+import { getAttendanceStatus } from '@/utils/timeUtils';
 
 const AttendanceList = () => {
 	const { data: attendanceData, isLoading, error } = useGetAttendanceQuery();
@@ -8,15 +10,12 @@ const AttendanceList = () => {
 	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
 	const dataToRender = Array.isArray(attendanceRecords) ? [...attendanceRecords].slice(0, 6) : [];
 
-	// Determine status based on clockIn time
-	const getStatus = (clockIn: string | null) => {
+	// Determine status based on clockIn time and shift start time
+	const getStatus = (clockIn: string | null, shiftStartTime?: string | null) => {
 		if (!clockIn) return 'Absent';
 
 		const clockInDate = new Date(clockIn);
-		const cutoffDate = new Date(clockInDate);
-		cutoffDate.setHours(8, 0, 0, 0); // Set to 8:00 AM
-
-		return clockInDate > cutoffDate ? 'Late' : 'On Time';
+		return getAttendanceStatus(clockInDate, shiftStartTime);
 	};
 
 	return (
@@ -26,6 +25,7 @@ const AttendanceList = () => {
 					<thead>
 						<tr>
 							<th>Name</th>
+							<th>Day</th>
 							<th>Check In</th>
 							<th>Check Out</th>
 							<th>Total Hour</th>
@@ -56,21 +56,26 @@ const AttendanceList = () => {
 
 								const employeeName = record.user?.name || 'N/A';
 								const employeeEmail = record.user?.email || '—';
-								const status = getStatus(record?.clockIn || null);
+								const shiftStartTime = record.user?.shift?.startTime;
+								const status = getStatus(record?.clockIn || null, shiftStartTime);
+								const clockInDate = record?.clockIn ? new Date(record?.clockIn) : null;
+								const day = clockInDate ? moment(clockInDate).format('dddd') : '—';
 
 								// Dynamic style based on status
 								const statusStyle = {
-									'On Time': 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]',
+									'Early': 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]',
 									'Late': 'bg-[#FEF3F2] border-[#FECDCA] text-[#B42318]',
 									'Absent': 'bg-[#FFFAF0] border-[#FEDF89] text-[#B54708]',
 									'On Leave': 'bg-[#F0F9FF] border-[#B9E6FE] text-[#026AA2]',
-									'Unknown': 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
+									'Unknown': 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]',
+									'N/A': 'bg-gray-100 text-gray-600'
 								}[status] || 'bg-gray-100 text-gray-600';
 
 								return (
 									<tr key={record?.id}>
 										<td data-title='Full Name' className='whitespace-nowrap'>{employeeName}</td>
 										{/* <td data-title='Email'>{employeeEmail}</td> */}
+										<td data-title='Day'>{day}</td>
 										<td data-title='Check In'>{checkIn}</td>
 										<td data-title='Check Out'>{checkOut}</td>
 										<td data-title='Total Hour'>{totalHour}</td>
