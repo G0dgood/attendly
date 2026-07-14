@@ -237,7 +237,7 @@ const EmployeeDashBoard = () => {
 								<th>Gender</th>
 								<th>Phone</th>
 								<th>Status</th>
-								<th>Attendance</th>
+								{/* <th>Attendance</th> */}
 								<th>Shift</th>
 								<th>Designation</th>
 								<th>Email address</th>
@@ -280,28 +280,27 @@ const EmployeeDashBoard = () => {
 											<td >{user?.phone}</td>
 											<td >
 												<div
-													className={`flex flex-row justify-center items-center px-[6px] py-[4px] w-[65px] h-[22px] border font-medium text-[11px] leading-[18px] ${
-														user?.isActive === 'active'
-															? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
-															: user?.isActive === 'resigned'
+													className={`flex flex-row justify-center items-center px-[6px] py-[4px] w-[65px] h-[22px] border font-medium text-[11px] leading-[18px] ${user?.isActive === 'active'
+														? 'bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]'
+														: user?.isActive === 'resigned'
 															? 'bg-[#EFF6FF] border-[#BFDBFE] text-[#1D4ED8]'
 															: 'bg-[#FEF2F2] border-[#FCA5A5] text-[#B91C1C]'
-													}`}
+														}`}
 												>
-													{user?.isActive === 'active' 
-														? 'Active' 
-														: user?.isActive === 'resigned' 
-														? 'Resigned' 
-														: 'Inactive'}
+													{user?.isActive === 'active'
+														? 'Active'
+														: user?.isActive === 'resigned'
+															? 'Resigned'
+															: 'Inactive'}
 												</div>
 											</td>
-											<td data-title="Attendance">
+											{/* <td data-title="Attendance">
 												<div
 													className={`whitespace-nowrap flex flex-row justify-center items-center px-[6px] py-[4px] w-[60px] h-[22px] border font-medium text-[12px] leading-[18px] ${statusStyle}`}
 												>
 													{status}
 												</div>
-											</td>
+											</td> */}
 											<td>
 												{user?.shift ? `${user.shift.name} (${user.shift.startTime} - ${user.shift.endTime})` : 'Not Assigned'}
 											</td>

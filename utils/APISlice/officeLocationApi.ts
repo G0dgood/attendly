@@ -6,7 +6,7 @@ export const officeLocationApi = baseApi.injectEndpoints({
       query: () => '/office-location',
       providesTags: ['OfficeLocation'],
     }),
-    addOfficeLocation: builder.mutation<any, { name: string; address: string }>({
+    addOfficeLocation: builder.mutation<any, { name: string; address: string; latitude?: number; longitude?: number }>({
       query: (body) => ({
         url: '/office-location',
         method: 'POST',
