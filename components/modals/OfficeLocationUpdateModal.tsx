@@ -14,14 +14,18 @@ const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) 
 	const [inputs, setInputs] = useState({
 		name: "",
 		address: "",
+		latitude: "",
+		longitude: "",
 	});
 
 	// Prefill the form when modal opens
 	useEffect(() => {
 		if (isOpen && office) {
 			setInputs({
-				name: office.name,
-				address: office.address,
+				name: office.name || "",
+				address: office.address || "",
+				latitude: office.latitude !== undefined && office.latitude !== null ? office.latitude.toString() : "",
+				longitude: office.longitude !== undefined && office.longitude !== null ? office.longitude.toString() : "",
 			});
 		}
 	}, [isOpen, office]);
@@ -40,11 +44,19 @@ const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) 
 		}));
 	};
 
-	const resetForm = () => { setInputs({ name: "", address: "", }) };
+	const resetForm = () => { setInputs({ name: "", address: "", latitude: "", longitude: "" }) };
 
 	const handleSubmit = async () => {
 		try {
-			await updateOfficeLocation({ id, body: inputs }).unwrap();
+			await updateOfficeLocation({
+				id,
+				body: {
+					name: inputs.name,
+					address: inputs.address,
+					latitude: inputs.latitude ? parseFloat(inputs.latitude) : null,
+					longitude: inputs.longitude ? parseFloat(inputs.longitude) : null,
+				}
+			}).unwrap();
 		} catch (error: any) {
 			toast.error(getErrorMessage(error, "Failed to update office location"));
 		}
@@ -100,6 +112,22 @@ const OfficeLocationUpdateModal = ({ id, office }: { id: string; office: any }) 
 									label="Address"
 									placeholder="Address"
 								/>
+								{/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+									<Input
+										type="text"
+										value={inputs.latitude}
+										handleOnChange={(e) => handleOnChange("latitude", e.target.value)}
+										label="Latitude"
+										placeholder="e.g. 6.5244"
+									/>
+									<Input
+										type="text"
+										value={inputs.longitude}
+										handleOnChange={(e) => handleOnChange("longitude", e.target.value)}
+										label="Longitude"
+										placeholder="e.g. 3.3792"
+									/>
+								</div> */}
 							</div>
 
 							{/* Footer */}
