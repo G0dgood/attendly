@@ -3,10 +3,10 @@ import React from 'react';
 interface SVGLoaderProps {
   width: string | number;
   height: string | number;
-  color: string;
+  color?: string;
 }
 
-export const SVGLoader: React.FC<SVGLoaderProps> = ({ width, height, color }) => {
+export const SVGLoader: React.FC<SVGLoaderProps> = ({ width, height, color = "#2563EB" }) => {
   return (
     <svg
       version="1.1"

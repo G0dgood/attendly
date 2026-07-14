@@ -8,8 +8,15 @@ import RealPagination from '@/components/RealPagination';
 import { toast } from 'sonner';
 import FilterDropdown from '@/components/FilterDropdown';
 import { useGetAttendanceParamsQuery } from '@/utils/APISlice/attendanceApi';
+import { useGetOfficeLocationsQuery } from '@/utils/APISlice/officeLocationApi';
+import CustomDropdownOffice from '@/components/CustomDropdownOffice';
+import { useUserPrivileges } from '@/utils/userPrivileges';
+import moment from "moment";
+import { getAttendanceStatus } from '@/utils/timeUtils';
 
 const Attendance = () => {
+	const { user, isSuperAdmin } = useUserPrivileges();
+	const [selectedOfficeId, setSelectedOfficeId] = useState("");
 	const endDates = new Date();
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
@@ -34,6 +41,7 @@ const Attendance = () => {
 	}, [debouncedSearchQuery]);
 
 	// RTK Query hook
+	const { data: officeData, isLoading: isLoadingOffice } = useGetOfficeLocationsQuery();
 	const { data: attendanceData, isLoading: loadingAttendanceParams } = useGetAttendanceParamsQuery({
 		page: currentPage,
 		limit,
@@ -41,7 +49,10 @@ const Attendance = () => {
 		startDate,
 		endDate,
 		search: debouncedSearchQuery,
+		officeId: isSuperAdmin ? selectedOfficeId : (user?.officeId || "")
 	});
+
+	const locationOptions = officeData?.data?.data || officeData?.data || officeData || [];
 
 	const attendanceRecords = attendanceData?.data?.data?.data || attendanceData?.data?.data || attendanceData?.data || [];
 	const pagination = attendanceData?.data?.data || attendanceData?.data || {};
@@ -136,11 +147,27 @@ const Attendance = () => {
 			<PageHeader text={"Attendance"} />
 
 			<div className='flex flex-col md:flex-row justify-between gap-5 mt-6'>
-				<Search
-					value={searchQuery}
-					onChange={(e) => setSearchQuery(e.target.value)}
-					placeholder="Search employees..."
-				/>
+				<div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+					<Search
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						placeholder="Search employees..."
+					/>
+					{isSuperAdmin && (
+						<div className="w-full md:w-[200px]">
+							<CustomDropdownOffice
+								label="All Locations"
+								options={[{ id: "", name: "All Locations", address: "" }, ...locationOptions]}
+								name="officeId"
+								handleOnChange={(_, value) => {
+									setSelectedOfficeId(value);
+									setCurrentPage(1);
+								}}
+								loading={isLoadingOffice}
+							/>
+						</div>
+					)}
+				</div>
 
 				<div className='flex flex-col md:flex-row gap-5 relative'>
 					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none">
@@ -187,6 +214,7 @@ const Attendance = () => {
 							<tr>
 								<th>Employee Name</th>
 								<th>Email</th>
+								<th>Day</th>
 								<th>Check In</th>
 								<th>Check Out</th>
 								<th>Total Hour</th>
@@ -195,9 +223,9 @@ const Attendance = () => {
 						</thead>
 						<tbody>
 							{loadingAttendanceParams ? (
-								<SVGLoaderFetch colSpan={6} />
+								<SVGLoaderFetch colSpan={7} />
 							) : dataToRender?.length === 0 ? (
-								<NoRecordFound colSpan={6} />
+								<NoRecordFound colSpan={7} />
 							) : (
 								dataToRender?.map((record: any) => {
 									const checkIn = record?.clockIn
@@ -217,15 +245,17 @@ const Attendance = () => {
 
 									const employeeName = record?.user?.name || 'N/A';
 									const employeeEmail = record?.user?.email || '—';
+									const shiftStartTime = record?.user?.shift?.startTime;
 
 									const clockInDate = record?.clockIn ? new Date(record?.clockIn) : null;
-									const isEarly = clockInDate && (clockInDate.getHours() < 8 || (clockInDate.getHours() === 8 && clockInDate.getMinutes() === 0));
-									const status = clockInDate ? (isEarly ? 'Early' : 'Late') : 'Absent';
+									const day = clockInDate ? moment(clockInDate).format('dddd') : '—';
+									const status = clockInDate ? getAttendanceStatus(clockInDate, shiftStartTime) : 'Absent';
 
 									return (
 										<tr key={record?.id}>
 											<td className='whitespace-nowrap'>{employeeName}</td>
 											<td>{employeeEmail}</td>
+											<td>{day}</td>
 											<td>{checkIn}</td>
 											<td>{checkOut}</td>
 											<td>{totalHour}</td>

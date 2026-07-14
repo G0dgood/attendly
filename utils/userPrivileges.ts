@@ -40,7 +40,7 @@ export function useUserPrivileges() {
   const userToken = activeUser?.token ?? null;
   const user = activeUser ?? null;
 
-  const isSuperAdmin = userType === "SuperAdmin";
+  const isSuperAdmin = userType === "SUPER_ADMIN";
   const isAdmin = userType?.toUpperCase() === "ADMIN"; 
   const isAgent = userType?.toUpperCase() === "AGENT";
   const token = userToken;

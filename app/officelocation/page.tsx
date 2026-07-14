@@ -6,19 +6,24 @@ import Search from '@/components/Search'
 import Image from "next/image";
 import moment from "moment";
 import OfficeLocationModal from '@/components/modals/OfficeLocationModal';
+import ShiftModal from '@/components/modals/ShiftModal';
 import { toast } from 'sonner';
 import OfficeLocationUpdateModal from '@/components/modals/OfficeLocationUpdateModal';
 
 
 import { useGetOfficeLocationsQuery, useAddOfficeLocationMutation, useUpdateOfficeLocationMutation } from '@/utils/APISlice/officeLocationApi';
+import { useUserPrivileges } from '@/utils/userPrivileges';
 
 const Attendance = () => {
+	const { isSuperAdmin } = useUserPrivileges();
 	const { data: officeData, isLoading } = useGetOfficeLocationsQuery();
 	const [addOfficeLocation, { isSuccess: addSuccess }] = useAddOfficeLocationMutation();
 	const [updateOfficeLocation, { isSuccess: updateSuccess }] = useUpdateOfficeLocationMutation();
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [shiftModalOpen, setShiftModalOpen] = useState(false);
+	const [selectedOfficeId, setSelectedOfficeId] = useState("");
 
 	// Extract data from RTK Query response
 	const officeLocations = officeData?.data?.data || officeData?.data || officeData || [];
@@ -56,12 +61,12 @@ const Attendance = () => {
 				/>
 
 				<div className='flex flex-col md:flex-row gap-5'>
-
-
-					<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB]  font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
-						onClick={() => setIsOpen(true)}>
-						Create Office
-					</button>
+					{isSuperAdmin && (
+						<button className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
+							onClick={() => setIsOpen(true)}>
+							Create Office
+						</button>
+					)}
 				</div>
 
 			</div>
@@ -77,7 +82,8 @@ const Attendance = () => {
 								<th>Address</th>
 								<th>Created At</th>
 								<th>Updated At</th>
-								<th></th>
+								<th>Manage Shifts</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -120,7 +126,19 @@ const Attendance = () => {
 										<td data-title="Updated At">
 											{moment(office.updatedAt).format("YYYY-MM-DD HH:mm")}
 										</td>
-										<td data-title="Updated">
+										<td data-title="Updated At">
+											<button
+												className="flex flex-row justify-center items-center px-5 py-[8px] gap-2 !bg-[#2563EB] font-normal text-[14px] leading-[150%] text-[#FFFFFF] rounded-none"
+												onClick={() => {
+													console.log('Opening ShiftModal for office.id:', office.id);
+													setSelectedOfficeId(office.id);
+													setShiftModalOpen(true);
+												}}
+											>
+												Manage Shifts
+											</button>
+										</td>
+										<td data-title="Actions">
 											<OfficeLocationUpdateModal id={office?.id} office={office} />
 										</td>
 									</tr>
@@ -131,36 +149,14 @@ const Attendance = () => {
 				</div>
 			</div>
 
-			{/* <div className='flex flex-row justify-between w-full mt-5'>
-				<button className="flex flex-row justify-center items-center py-2 gap-2  px-5  bg-white border border-[#E5E7EB] font-medium text-3 leading-[150%] text-[#3A4050]">
-					<Image
-						src={require("../../public/icon/arrow-left.svg")}
-						alt="Next"
-					/> Previous</button>
-				<div className="flex flex-row items-center gap-[10px]">
-					<button className="w-5 h-5 bg-[#F9FAFB] flex justify-center items-center border border-[#E5E7EB]
-				text-3 leading-5 text-center text-[#050711] font-inter">1</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">2</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">3</button>
-					<div>
-						<Image
-							src={require("../../public/icon/Number.svg")}
-							alt="Next"
-						/>
-					</div>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">8</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">9</button>
-					<button className="text-3 leading-5 text-center text-[#050711] font-inter">10</button>
-				</div>
-				<button className="flex flex-row justify-center items-center   py-2 gap-2  px-5  bg-white border border-[#E5E7EB]   font-medium text-[12px] leading-[150%] text-[#3A4050]">
-					Next
-					<Image
-						src={require("../../public/icon/arrow-right.svg")}
-						alt="Next"
-					/>
-				</button>
-			</div> */}
 			<OfficeLocationModal isOpen={isOpen} setIsOpen={setIsOpen} />
+			{shiftModalOpen && (
+				<ShiftModal
+					isOpen={shiftModalOpen}
+					setIsOpen={setShiftModalOpen}
+					officeId={selectedOfficeId}
+				/>
+			)}
 		</div>
 	)
 }

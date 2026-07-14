@@ -8,13 +8,15 @@ interface ManualClockInModalProps {
 	isLoadingAttendance: boolean;
 	onClose: () => void;
 	onConfirm: () => void;
+	type?: 'CHECK_IN' | 'CHECK_OUT';
 }
 
 const ManualClockInModal: React.FC<ManualClockInModalProps> = ({
 	isOpen,
 	onClose,
 	onConfirm,
-	isLoadingAttendance
+	isLoadingAttendance,
+	type = 'CHECK_IN'
 }) => {
 	const [currentTime, setCurrentTime] = useState<string>("");
 
@@ -36,14 +38,16 @@ const ManualClockInModal: React.FC<ManualClockInModalProps> = ({
 
 	if (!isOpen) return null;
 
+	const isCheckIn = type === 'CHECK_IN';
+
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000051] bg-opacity-50   ">
 			<div className="w-full max-w-md   !bg-[#fff] border border-blue-300  shadow-2xl p-8 transform transition-all duration-300 scale-100 rounded-none">
 				<h2 className="text-3xl font-bold text-center !text-blue-800 mb-2">
-					Confirm Manual Clock-In
+					Confirm Manual {isCheckIn ? 'Clock-In' : 'Clock-Out'}
 				</h2>
 				<p className="text-center text-gray-700 text-sm mb-6">
-					This action will manually register the employee’s clock-in at the current time. Please
+					This action will manually register the employee’s {isCheckIn ? 'clock-in' : 'clock-out'} at the current time. Please
 					confirm if you'd like to proceed.
 				</p>
 
@@ -65,7 +69,7 @@ const ManualClockInModal: React.FC<ManualClockInModalProps> = ({
 						onClick={onConfirm}
 						className="px-6 py-3   !bg-green-500 !hover:bg-green-600 text-white font-semibold transition shadow-md w-full sm:w-auto rounded-none cursor-pointer"
 					>
-						{isLoadingAttendance ? <SVGLoader width={"30px"} height={"30px"} color={"#0866FF"} /> : " Clock In"}
+						{isLoadingAttendance ? <SVGLoader width={"30px"} height={"30px"} color={"#0866FF"} /> : (isCheckIn ? "Clock In" : "Clock Out")}
 
 					</button>
 				</div>

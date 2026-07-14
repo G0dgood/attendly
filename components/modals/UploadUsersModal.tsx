@@ -142,7 +142,9 @@ const UploadUsersModal = ({ isOpen, setIsOpen }: UploadUsersModalProps) => {
 
 	const downloadSampleTemplate = () => {
 		const headers = "name,email,password,phone,role,gender\n";
-		const blob = new Blob([headers], { type: "text/csv;charset=utf-8;" });
+		const sampleData = "Jane Doe,jane.doe@example.com,12345678,08012345678,AGENT,Female\n";
+		const csvContent = headers + sampleData;
+		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement("a");
 		link.href = url;
